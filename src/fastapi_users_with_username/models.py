@@ -17,5 +17,5 @@ class UserProtocolWithUsername(Protocol[fastapi_users.models.ID]):
     is_verified: bool
 
 
-UPwUN = TypeVar("UPwUN", bound=UserProtocolWithUsername)
+UP = TypeVar("UP", bound=UserProtocolWithUsername)
 

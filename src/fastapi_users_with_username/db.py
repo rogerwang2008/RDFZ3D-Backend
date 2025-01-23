@@ -54,9 +54,9 @@ class SQLModelUserDatabaseAsync(fastapi_users_db_sqlmodel.SQLModelUserDatabaseAs
     async def get_by_any_identifier(self, identifier: str):
         """Get a single user by username or email or phone number."""
         statement = sqlmodel.select(self.user_model).where(  # type: ignore
-            func.lower(self.user_model.username) == func.lower(identifier)
-            | func.lower(self.user_model.email) == func.lower(identifier)
-            | self.user_model.phone_no == identifier
+            (func.lower(self.user_model.username) == func.lower(identifier))
+            | (func.lower(self.user_model.email) == func.lower(identifier))
+            | (self.user_model.phone_no == identifier)
         )
         results = await self.session.execute(statement)
         obj = results.first()

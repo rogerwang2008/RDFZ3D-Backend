@@ -1,0 +1,20 @@
+### 注册
+POST {{host}}{{auth_prefix}}/register
+content-type: application/json
+
+{
+  "username": "zhangsan",
+  "email": "zhangsan@example.com",
+  "phone_no": "1",
+  "password": "password"
+}
+###
+
+### 登录
+POST {{host}}{{auth_prefix}}/jwt/login
+content-type: application/x-www-form-urlencoded
+
+username = zhangsan &
+password = password
+
+###

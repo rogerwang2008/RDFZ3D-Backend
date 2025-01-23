@@ -3,7 +3,7 @@ import contextlib
 from fastapi import FastAPI
 
 import user
-import universal.database
+import universal.database, universal.config
 
 
 @contextlib.asynccontextmanager
@@ -12,7 +12,12 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title=universal.config.settings.PROJECT_NAME,
+    description=universal.config.settings.DESCRIPTION,
+    version=universal.config.settings.VERSION,
+    lifespan=lifespan
+)
 
 
 @app.get("/hello/{name}")

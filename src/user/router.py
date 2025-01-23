@@ -16,6 +16,11 @@ router.include_router(
 )
 
 router.include_router(
+    users.fastapi_users_obj.get_register_router(schemas.UserRead, schemas.UserCreate),
+    prefix="",
+)
+
+router.include_router(
     users.fastapi_users_obj.get_verify_router(schemas.UserRead),
     prefix="",
 )
@@ -25,9 +30,5 @@ router.include_router(
 )
 router.include_router(
     users.fastapi_users_obj.get_users_router(schemas.UserRead, schemas.UserUpdate),
-    prefix="",
-)
-router.include_router(
-    users.fastapi_users_obj.get_register_router(schemas.UserRead, schemas.UserCreate),
     prefix="",
 )

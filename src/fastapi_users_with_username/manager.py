@@ -1,27 +1,46 @@
 from typing import Optional
 
+import fastapi.security
 from fastapi import Request
 import fastapi_users
 
 from . import models
-from .db import SQLModelUserDatabaseAsync
-from .exceptions import UserWithFieldAlreadyExists
+from . import db
+from . import exceptions
 
 SECRET = "DONTBEYOURSELFYOUWILLPAYFORIT"
 
 
-class BaseUserManager(fastapi_users.BaseUserManager[models.UPwUN, fastapi_users.models.ID]):
+class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.models.ID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
-    user_db: SQLModelUserDatabaseAsync
+    user_db: db.SQLModelUserDatabaseAsync
+
+    async def get_by_username(self, username: str):
+        user = await self.user_db.get_by_username(username)
+        if user is None:
+            raise fastapi_users.exceptions.UserNotExists()
+        return user
+
+    async def get_by_phone_no(self, phone_no: str):
+        user = await self.user_db.get_by_phone_no(phone_no)
+        if user is None:
+            raise fastapi_users.exceptions.UserNotExists()
+        return user
+
+    async def get_by_any_identifier(self, identifier: str):
+        user = await self.user_db.get_by_any_identifier(identifier)
+        if user is None:
+            raise fastapi_users.exceptions.UserNotExists()
+        return user
 
     async def create(
             self,
             user_create: fastapi_users.schemas.UC,
             safe: bool = False,
             request: Optional[Request] = None,
-    ) -> models.UPwUN:
+    ) -> models.UP:
         """
         Create a user in database.
 
@@ -44,15 +63,15 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UPwUN, fastapi_users.
         #     raise fastapi_users.exceptions.UserAlreadyExists()
         existing_user_with_username = await self.user_db.get_by_username(user_create.username)
         if existing_user_with_username is not None:
-            raise UserWithFieldAlreadyExists("username")
+            raise exceptions.UserWithFieldAlreadyExists("username")
         if user_create.email:
             existing_user_with_email = await self.user_db.get_by_email(user_create.email)
             if existing_user_with_email is not None:
-                raise UserWithFieldAlreadyExists("email")
+                raise exceptions.UserWithFieldAlreadyExists("email")
         if user_create.phone_no:
             existing_user_with_phone_no = await self.user_db.get_by_phone_no(user_create.phone_no)
             if existing_user_with_phone_no is not None:
-                raise UserWithFieldAlreadyExists("phone_no")
+                raise exceptions.UserWithFieldAlreadyExists("phone_no")
 
         user_dict = (
             user_create.create_update_dict()
@@ -67,3 +86,33 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UPwUN, fastapi_users.
         await self.on_after_register(created_user, request)
 
         return created_user
+
+    async def authenticate(
+            self, credentials: fastapi.security.OAuth2PasswordRequestForm
+    ) -> Optional[models.UP]:
+        """
+        Authenticate and return a user following an email and a password.
+
+        Will automatically upgrade password hash if necessary.
+
+        :param credentials: The user credentials.
+        """
+        try:
+            user = await self.get_by_any_identifier(credentials.username)
+        except fastapi_users.exceptions.UserNotExists:
+            # Run the hasher to mitigate timing attack
+            # Inspired from Django: https://code.djangoproject.com/ticket/20760
+            self.password_helper.hash(credentials.password)
+            return None
+
+        verified, updated_password_hash = self.password_helper.verify_and_update(
+            credentials.password, user.hashed_password
+        )
+        if not verified:
+            return None
+        # Update password hash to a more robust one if needed
+        if updated_password_hash is not None:
+            await self.user_db.update(user, {"hashed_password": updated_password_hash})
+
+        return user
+

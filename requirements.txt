@@ -4,3 +4,4 @@ fastapi~=0.115.6
 pydantic-settings~=2.7.1
 asyncmy~=0.2.10
 SQLAlchemy~=2.0.37
+asyncmy~=0.2.10
