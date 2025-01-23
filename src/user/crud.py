@@ -11,3 +11,4 @@ from . import db
 #         raise HTTPException(status_code=404, detail="User not found")
 #     return user
 
+# 没用。fastapi_users 全封装好了

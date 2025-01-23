@@ -1,18 +1,21 @@
 from typing import Optional
-from fastapi import Depends
-from pydantic import BaseModel, EmailStr
-from fastapi_users_db_sqlmodel import SQLModelBaseUserDB, SQLModelUserDatabaseAsync
-from sqlmodel import SQLModel, Field
+import fastapi
+import pydantic
+import fastapi_users_db_sqlmodel
+import sqlmodel
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.functions import func
 
 from universal import database
+import fastapi_users_with_username
 
 
-class User(SQLModelBaseUserDB, table=True):
-    email: EmailStr = Field(sa_column_kwargs={"unique": True, "index": True}, nullable=True)
-    phone_no: str = Field(sa_column_kwargs={"unique": True, "index": True}, nullable=True)
+class User(fastapi_users_db_sqlmodel.SQLModelBaseUserDB, table=True):
+    username: str = sqlmodel.Field(sa_column_kwargs={"unique": True, "index": True})
+    email: Optional[pydantic.EmailStr] = sqlmodel.Field(sa_column_kwargs={"unique": True, "index": True}, nullable=True)
+    phone_no: Optional[str] = sqlmodel.Field(sa_column_kwargs={"unique": True, "index": True}, nullable=True)
     nickname: Optional[str]
 
 
-async def get_user_db(session: AsyncSession = Depends(database.get_async_session)):
-    yield SQLModelUserDatabaseAsync(session, User)
+async def get_user_db(session: AsyncSession = fastapi.Depends(database.get_async_session)):
+    yield fastapi_users_with_username.db.SQLModelUserDatabaseAsync(session, User)

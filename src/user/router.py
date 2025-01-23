@@ -4,9 +4,7 @@ from fastapi import APIRouter
 from . import db, schemas, users
 
 from universal import database
-from . import crud, db, schemas, users
-
-
+from . import db, schemas, users
 
 
 router = APIRouter()
@@ -15,10 +13,6 @@ router = APIRouter()
 router.include_router(
     users.fastapi_users_obj.get_auth_router(users.auth_backend),
     prefix="/jwt",
-)
-router.include_router(
-    users.fastapi_users_obj.get_register_router(schemas.UserRead, schemas.UserCreate),
-    prefix="",
 )
 
 router.include_router(
@@ -31,5 +25,9 @@ router.include_router(
 )
 router.include_router(
     users.fastapi_users_obj.get_users_router(schemas.UserRead, schemas.UserUpdate),
+    prefix="",
+)
+router.include_router(
+    users.fastapi_users_obj.get_register_router(schemas.UserRead, schemas.UserCreate),
     prefix="",
 )

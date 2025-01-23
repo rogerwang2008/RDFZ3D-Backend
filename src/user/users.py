@@ -2,20 +2,17 @@ import uuid
 from typing import Optional, AsyncGenerator
 
 from fastapi import Depends, Request
-from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin, models
-from fastapi_users.authentication import (
-    AuthenticationBackend,
-    BearerTransport,
-    JWTStrategy,
-)
-from fastapi_users_db_sqlmodel import SQLModelBaseUserDB, SQLModelUserDatabaseAsync
+import fastapi_users
+import fastapi_users.authentication
+import fastapi_users_db_sqlmodel
+import fastapi_users_with_username
 
 from .db import User, get_user_db
 
 SECRET = "DONTBEYOURSELFYOUWILLPAYFORIT"
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -33,23 +30,24 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 
-async def get_user_manager(user_db: SQLModelUserDatabaseAsync = Depends(get_user_db)) -> AsyncGenerator[UserManager, None]:
+async def get_user_manager(user_db: fastapi_users_db_sqlmodel.SQLModelUserDatabaseAsync = Depends(get_user_db)) \
+        -> AsyncGenerator[UserManager, None]:
     yield UserManager(user_db)
 
 
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
+bearer_transport = fastapi_users.authentication.BearerTransport(tokenUrl="auth/jwt/login")
 
 
-def get_jwt_strategy() -> JWTStrategy[models.UP, models.ID]:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+def get_jwt_strategy() -> fastapi_users.authentication.JWTStrategy[fastapi_users.models.UP, fastapi_users.models.ID]:
+    return fastapi_users.authentication.JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
 
-auth_backend = AuthenticationBackend(
+auth_backend = fastapi_users.authentication.AuthenticationBackend(
     name="jwt",
     transport=bearer_transport,
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users_obj = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
+fastapi_users_obj = fastapi_users.FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
 current_active_user = fastapi_users_obj.current_user(active=True)

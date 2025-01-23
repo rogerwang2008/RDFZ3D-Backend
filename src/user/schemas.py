@@ -1,19 +1,16 @@
-from typing import Optional
 import uuid
-from fastapi_users import schemas
+
+import fastapi_users_with_username
 
 
-class UserRead(schemas.BaseUser[uuid.UUID]):
-    phone_no: str
-    nickname: Optional[str] = None
+class UserRead(fastapi_users_with_username.schemas.BaseUser[uuid.UUID]):
+    pass
 
 
-class UserCreate(schemas.BaseUserCreate):
-    phone_no: str
-    nickname: Optional[str] = None
+class UserCreate(fastapi_users_with_username.schemas.BaseUserCreate):
+    pass
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    phone_no: Optional[str] = None
-    nickname: Optional[str] = None
+class UserUpdate(fastapi_users_with_username.schemas.BaseUserUpdate):
+    pass
 
