@@ -4,7 +4,7 @@ import fastapi_users.models
 
 
 
-class UserProtocolWithUsername(Protocol[fastapi_users.models.ID]):
+class UserProtocol(Protocol[fastapi_users.models.ID]):
     """User protocol that ORM model should follow."""
 
     id: fastapi_users.models.ID
@@ -17,5 +17,5 @@ class UserProtocolWithUsername(Protocol[fastapi_users.models.ID]):
     is_verified: bool
 
 
-UP = TypeVar("UP", bound=UserProtocolWithUsername)
+UP = TypeVar("UP", bound=UserProtocol)
 

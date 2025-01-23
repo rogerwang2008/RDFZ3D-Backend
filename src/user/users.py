@@ -8,8 +8,9 @@ import fastapi_users_db_sqlmodel
 import fastapi_users_with_username
 
 from .db import User, get_user_db
+import universal.config
 
-SECRET = "DONTBEYOURSELFYOUWILLPAYFORIT"
+SECRET = universal.config.settings.SECRET_KEY
 
 
 class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUserManager[User, uuid.UUID]):

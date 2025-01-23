@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "人大附中数字校园系统"
     ENV: Literal["development", "staging", "production"] = "development"
     VERSION: str = "0.0.1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "IHateEverySinglePersonInTheWorld"
     DATABASE_URI: str = "mysql+asyncmy://rdfz3d_main:KpHHrxBwW2PaPZtp@localhost:3306/rdfz3d_main"
 
     class Config:
