@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypeVar
 import fastapi_users.models
 from pydantic import EmailStr
 
@@ -31,3 +31,8 @@ class BaseUserUpdate(fastapi_users.schemas.BaseUserUpdate):
     is_active: Optional[bool] = None
     is_superuser: Optional[bool] = None
     is_verified: Optional[bool] = None
+
+
+U = TypeVar("U", bound=BaseUser)
+UC = TypeVar("UC", bound=BaseUserCreate)
+UU = TypeVar("UU", bound=BaseUserUpdate)

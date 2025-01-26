@@ -49,6 +49,6 @@ auth_backend = fastapi_users.authentication.AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users_obj = fastapi_users.FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
+fastapi_users_obj = fastapi_users_with_username.FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
 current_active_user = fastapi_users_obj.current_user(active=True)
