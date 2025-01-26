@@ -8,13 +8,8 @@ from . import models
 from . import db
 from . import exceptions
 
-SECRET = "DONTBEYOURSELFYOUWILLPAYFORIT"
-
 
 class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.models.ID]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
-
     user_db: db.SQLModelUserDatabaseAsync
 
     async def get_by_username(self, username: str):
