@@ -1,6 +1,5 @@
-import typing
+from typing import TYPE_CHECKING, Optional, Generic
 import uuid
-from typing import Optional
 
 from pydantic import UUID4, EmailStr
 import sqlmodel
@@ -8,12 +7,13 @@ from sqlalchemy import func
 import fastapi_users_db_sqlmodel
 
 
-class SQLModelBaseUserDB(fastapi_users_db_sqlmodel.SQLModelBaseUserDB):
+class SQLModelBaseUserDB(sqlmodel.SQLModel):
+    __tablename__ = "user"
     id: UUID4 = sqlmodel.Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
     username: str = sqlmodel.Field(
         sa_column_kwargs={"unique": True, "index": True}, nullable=False
     )
-    if typing.TYPE_CHECKING:  # pragma: no cover
+    if TYPE_CHECKING:  # pragma: no cover
         email: Optional[str]
     else:
         email: Optional[EmailStr] = sqlmodel.Field(
@@ -22,9 +22,14 @@ class SQLModelBaseUserDB(fastapi_users_db_sqlmodel.SQLModelBaseUserDB):
     phone_no: Optional[str] = sqlmodel.Field(
         sa_column_kwargs={"unique": True, "index": True}, nullable=True
     )
+    hashed_password: str
     is_active: bool = sqlmodel.Field(True, nullable=False)
     is_superuser: bool = sqlmodel.Field(False, nullable=False)
     is_verified: bool = sqlmodel.Field(False, nullable=False)
+    is_email_verified: bool = sqlmodel.Field(False, nullable=False)
+    is_phone_verified: bool = sqlmodel.Field(False, nullable=False)
+    class Config:
+        orm_mode = True
 
 
 class SQLModelUserDatabaseAsync(fastapi_users_db_sqlmodel.SQLModelUserDatabaseAsync):

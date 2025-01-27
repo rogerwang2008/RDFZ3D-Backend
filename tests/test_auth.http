@@ -1,4 +1,4 @@
-### 注册
+### 注册 zhangsan
 POST {{host}}{{auth_prefix}}/register
 content-type: application/json
 
@@ -8,13 +8,17 @@ content-type: application/json
   "phone_no": "1",
   "password": "password"
 }
-###
 
-### 登录
+### 登录 zhangsan
 POST {{host}}{{auth_prefix}}/jwt/login
 content-type: application/x-www-form-urlencoded
 
-username = zhangsan &
-password = password
+username=zhangsan&password=password
 
-###
+> {%
+    client.global.set("token", response.body.access_token);
+%}
+
+### 获取用户信息
+GET {{host}}{{auth_prefix}}/me
+Authorization: Bearer {{token}}
