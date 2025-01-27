@@ -6,3 +6,8 @@ asyncmy~=0.2.10
 SQLAlchemy~=2.0.37
 asyncmy~=0.2.10
 fastapi_users_db_sqlmodel~=0.3.0
+
+python-ulid~=3.0.0
+jwt~=1.3.1
+PyJWT~=2.8.0
+pydantic-extra-types~=2.10.2

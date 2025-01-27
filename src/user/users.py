@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional, AsyncGenerator
 
 from fastapi import Depends, Request
@@ -8,12 +7,13 @@ import fastapi_users_db_sqlmodel
 import fastapi_users_with_username
 
 from .db import User, get_user_db
+from .schemas import ID_TYPE
 import universal.config
 
 SECRET = universal.config.settings.SECRET_KEY
 
 
-class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUserManager[User, uuid.UUID]):
+class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUserManager[User, ID_TYPE]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -49,6 +49,6 @@ auth_backend = fastapi_users.authentication.AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users_obj = fastapi_users_with_username.FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
+fastapi_users_obj = fastapi_users_with_username.FastAPIUsers[User, ID_TYPE](get_user_manager, [auth_backend])
 
 current_active_user = fastapi_users_obj.current_user(active=True)

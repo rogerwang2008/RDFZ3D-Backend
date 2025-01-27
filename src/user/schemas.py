@@ -2,8 +2,10 @@ import uuid
 
 import fastapi_users_with_username
 
+ID_TYPE = uuid.UUID
 
-class UserRead(fastapi_users_with_username.schemas.BaseUser[uuid.UUID]):
+
+class UserRead(fastapi_users_with_username.schemas.BaseUser[ID_TYPE]):
     pass
 
 

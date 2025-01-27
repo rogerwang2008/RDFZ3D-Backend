@@ -1,13 +1,12 @@
 from typing import Optional
-
+import logging
 import fastapi.security
 import fastapi_users.jwt
 import jwt.exceptions
 from fastapi import Request
 import fastapi_users
 
-from . import models
-from . import db
+from . import models, db, schemas
 from . import exceptions
 
 
@@ -34,7 +33,7 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
 
     async def create(
             self,
-            user_create: fastapi_users.schemas.UC,
+            user_create: schemas.UC,
             safe: bool = False,
             request: Optional[Request] = None,
     ) -> models.UP:
@@ -55,15 +54,15 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
 
         existing_user_with_username = await self.user_db.get_by_username(user_create.username)
         if existing_user_with_username is not None:
-            raise exceptions.UserWithFieldAlreadyExists("username")
+            raise exceptions.UserWithIdentifierAlreadyExists("username")
         if user_create.email:
             existing_user_with_email = await self.user_db.get_by_email(user_create.email)
             if existing_user_with_email is not None:
-                raise exceptions.UserWithFieldAlreadyExists("email")
+                raise exceptions.UserWithIdentifierAlreadyExists("email")
         if user_create.phone_no:
             existing_user_with_phone_no = await self.user_db.get_by_phone_no(user_create.phone_no)
             if existing_user_with_phone_no is not None:
-                raise exceptions.UserWithFieldAlreadyExists("phone_no")
+                raise exceptions.UserWithIdentifierAlreadyExists("phone_no")
 
         user_dict = (
             user_create.create_update_dict()
@@ -74,6 +73,8 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         user_dict["hashed_password"] = self.password_helper.hash(password)
 
         created_user = await self.user_db.create(user_dict)
+
+        print(f"User {user_dict} registered")
 
         await self.on_after_register(created_user, request)
 
