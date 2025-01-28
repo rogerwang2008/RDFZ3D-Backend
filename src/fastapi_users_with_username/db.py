@@ -2,9 +2,13 @@ from typing import TYPE_CHECKING, Optional, Generic
 import uuid
 
 from pydantic import UUID4, EmailStr
+from pydantic_extra_types.phone_numbers import PhoneNumber
 import sqlmodel
 from sqlalchemy import func
 import fastapi_users_db_sqlmodel
+
+PhoneNumber.default_region_code = "CN"
+PhoneNumber.phone_format = "E164"
 
 
 class SQLModelBaseUserDB(sqlmodel.SQLModel):
@@ -13,21 +17,25 @@ class SQLModelBaseUserDB(sqlmodel.SQLModel):
     username: str = sqlmodel.Field(
         sa_column_kwargs={"unique": True, "index": True}, nullable=False
     )
-    if TYPE_CHECKING:  # pragma: no cover
+    if TYPE_CHECKING:
         email: Optional[str]
     else:
         email: Optional[EmailStr] = sqlmodel.Field(
             sa_column_kwargs={"unique": True, "index": True}, nullable=True
         )
-    phone_no: Optional[str] = sqlmodel.Field(
-        sa_column_kwargs={"unique": True, "index": True}, nullable=True
-    )
+    if TYPE_CHECKING:
+        phone_no: Optional[str]
+    else:
+        phone_no: Optional[PhoneNumber] = sqlmodel.Field(
+            sa_column_kwargs={"unique": True, "index": True}, nullable=True
+        )
     hashed_password: str
     is_active: bool = sqlmodel.Field(True, nullable=False)
     is_superuser: bool = sqlmodel.Field(False, nullable=False)
     is_verified: bool = sqlmodel.Field(False, nullable=False)
     is_email_verified: bool = sqlmodel.Field(False, nullable=False)
     is_phone_verified: bool = sqlmodel.Field(False, nullable=False)
+
     class Config:
         orm_mode = True
 
