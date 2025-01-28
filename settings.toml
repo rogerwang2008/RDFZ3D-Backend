@@ -1,0 +1,6 @@
+[database]
+username = "rdfz3d_main"
+password = "pwd"
+host = "localhost"
+port = 3306
+database = "rdfz3d_main"
