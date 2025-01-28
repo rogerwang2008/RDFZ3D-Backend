@@ -1,13 +1,11 @@
 from typing import Optional
-import logging
 import fastapi.security
 import fastapi_users.jwt
 import jwt.exceptions
 from fastapi import Request
 import fastapi_users
 
-from . import models, db, schemas
-from . import exceptions
+from . import models, db, schemas, common, exceptions
 
 
 class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.models.ID]):
@@ -47,22 +45,22 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         will be ignored during the creation, defaults to False.
         :param request: Optional FastAPI request that
         triggered the operation, defaults to None.
-        :raises UserAlreadyExists: A user already exists with the same e-mail.
+        :raises UserWithIdentifierAlreadyExists: A user already exists with the same e-mail/....
         :return: A new user.
         """
         await self.validate_password(user_create.password, user_create)
 
         existing_user_with_username = await self.user_db.get_by_username(user_create.username)
         if existing_user_with_username is not None:
-            raise exceptions.UserWithIdentifierAlreadyExists("username")
+            raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.USERNAME)
         if user_create.email:
             existing_user_with_email = await self.user_db.get_by_email(user_create.email)
             if existing_user_with_email is not None:
-                raise exceptions.UserWithIdentifierAlreadyExists("email")
+                raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.EMAIL)
         if user_create.phone_no:
             existing_user_with_phone_no = await self.user_db.get_by_phone_no(user_create.phone_no)
             if existing_user_with_phone_no is not None:
-                raise exceptions.UserWithIdentifierAlreadyExists("phone_no")
+                raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.PHONE_NO)
 
         user_dict = (
             user_create.create_update_dict()
