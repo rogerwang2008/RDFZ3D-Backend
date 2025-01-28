@@ -59,7 +59,7 @@ async def get_user_manager(user_db: fastapi_users_db_sqlmodel.SQLModelUserDataba
     yield UserManager(user_db)
 
 
-bearer_transport = fastapi_users.authentication.BearerTransport(tokenUrl="auth/jwt/login")
+bearer_transport = fastapi_users.authentication.BearerTransport(tokenUrl="auth/login")
 
 
 def get_database_strategy(access_token_db: fastapi_users.authentication.strategy.db.AccessTokenDatabase[db.AccessToken]
