@@ -4,6 +4,7 @@ import fastapi_users
 import fastapi_users.router
 
 from .. import exceptions, models, schemas, manager, common
+from . import common as router_common
 
 
 def get_register_router(
@@ -31,6 +32,15 @@ def get_register_router(
                                     "detail": {
                                         "code": fastapi_users.router.common.ErrorCode.REGISTER_USER_ALREADY_EXISTS,
                                         "identifier": common.Identifiers.EMAIL,
+                                    }
+                                },
+                            },
+                            router_common.ExtendedErrorCode.REGISTER_INVALID_USERNAME: {
+                                "summary": "Username validation failed.",
+                                "value": {
+                                    "detail": {
+                                        "code": router_common.ExtendedErrorCode.REGISTER_INVALID_USERNAME,
+                                        "reason": "Username should be at least 3 characters",
                                     }
                                 },
                             },
@@ -65,6 +75,14 @@ def get_register_router(
                 detail={
                     "code": fastapi_users.router.common.ErrorCode.REGISTER_USER_ALREADY_EXISTS,
                     "identifier": e.identifier,
+                }
+            )
+        except exceptions.InvalidUsernameException as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": router_common.ExtendedErrorCode.REGISTER_INVALID_USERNAME,
+                    "reason": e.reason,
                 }
             )
         except fastapi_users.exceptions.InvalidPasswordException as e:

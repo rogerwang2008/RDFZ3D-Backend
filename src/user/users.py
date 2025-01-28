@@ -1,10 +1,14 @@
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator, Union
+import re
 
 from fastapi import Depends, Request
 import fastapi_users
 import fastapi_users.authentication
 import fastapi_users_db_sqlmodel
+from fastapi_users import models
+
 import fastapi_users_with_username
+import fastapi_users_with_username.exceptions
 
 from . import db
 from . import schemas
@@ -29,6 +33,25 @@ class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUse
             self, user: db.User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+
+    async def validate_username(self, username: str, _) -> None:
+        if not re.match(r"^[a-zA-Z0-9_]+$", username):
+            raise fastapi_users_with_username.exceptions.InvalidUsernameException(
+                "Username can only contain letters, numbers, and underscores.")
+        if len(username) < 4:
+            raise fastapi_users_with_username.exceptions.InvalidUsernameException(
+                "Username must have at least 4 characters.")
+        if len(username) > 100:
+            raise fastapi_users_with_username.exceptions.InvalidUsernameException(
+                "Username can't be longer than 100 characters.")
+
+    async def validate_password(self, password: str, _) -> None:
+        if not password.isascii():
+            raise fastapi_users.exceptions.InvalidPasswordException("Password can only contain ASCII characters.")
+        if len(password) < 3:
+            raise fastapi_users.exceptions.InvalidPasswordException("Password should be at least 3 characters")
+        if len(password) > 100:
+            raise fastapi_users.exceptions.InvalidPasswordException("Password can't be longer than 100 characters.")
 
 
 async def get_user_manager(user_db: fastapi_users_db_sqlmodel.SQLModelUserDatabaseAsync = Depends(db.get_user_db)) \

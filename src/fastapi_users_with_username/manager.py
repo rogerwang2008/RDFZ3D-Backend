@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 import fastapi.security
 import fastapi_users.jwt
 import jwt.exceptions
@@ -222,3 +222,16 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         updated_user = await self._update(user, updated_user_data)
         await self.on_after_update(updated_user, updated_user_data, request)
         return updated_user
+
+    async def validate_username(self, username: str, user: Union[schemas.UC, models.UP]) -> None:
+        """
+        Validate a username.
+
+        *You should overload this method to add your own validation logic.*
+
+        :param username: The username to validate.
+        :param user: The user associated to this username.
+        :raises InvalidUsernameException: The username is invalid.
+        :return: None if the username is valid.
+        """
+        return
