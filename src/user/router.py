@@ -12,7 +12,7 @@ router = APIRouter()
 # @router.get("/get_user_info", response_model=schemas.User)
 router.include_router(
     users.fastapi_users_obj.get_auth_router(users.auth_backend),
-    prefix="/jwt",
+    prefix="",
 )
 
 router.include_router(
