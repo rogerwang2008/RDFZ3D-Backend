@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Generic
+from typing import TYPE_CHECKING, Optional
 import uuid
 
 from pydantic import UUID4, EmailStr

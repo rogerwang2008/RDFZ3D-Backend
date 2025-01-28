@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar, Generic
+from typing import Optional, TypeVar, Generic, TYPE_CHECKING
 import fastapi_users.schemas
 import pydantic
 from pydantic import EmailStr
@@ -33,7 +33,10 @@ class CreateUpdateDictModel(pydantic.BaseModel):
 class BaseUser(CreateUpdateDictModel, Generic[models.ID]):
     id: fastapi_users.models.ID
     username: str
-    email: Optional[EmailStr]
+    if TYPE_CHECKING:
+        email: Optional[str]
+    else:
+        email: Optional[EmailStr]
     phone_no: Optional[PhoneNumber]
     is_active: bool = True
     is_superuser: bool = False
@@ -46,7 +49,10 @@ class BaseUser(CreateUpdateDictModel, Generic[models.ID]):
 
 class BaseUserCreate(CreateUpdateDictModel):
     username: str
-    email: Optional[EmailStr]
+    if TYPE_CHECKING:
+        email: Optional[str]
+    else:
+        email: Optional[EmailStr]
     phone_no: Optional[PhoneNumber]
     password: str
     is_active: Optional[bool] = True
@@ -59,7 +65,10 @@ class BaseUserCreate(CreateUpdateDictModel):
 class BaseUserUpdate(CreateUpdateDictModel):
     password: Optional[str] = None
     username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    if TYPE_CHECKING:
+        email: Optional[str] = None
+    else:
+        email: Optional[EmailStr] = None
     phone_no: Optional[PhoneNumber] = None
     is_active: Optional[bool] = None
     is_superuser: Optional[bool] = None
