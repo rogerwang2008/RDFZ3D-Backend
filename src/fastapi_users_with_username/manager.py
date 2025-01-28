@@ -191,3 +191,36 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         await self.on_after_verify(verified_user, request)
 
         return verified_user
+
+    async def update(
+            self,
+            user_update: schemas.UU,
+            user: models.UP,
+            safe: bool = False,
+            request: Optional[Request] = None,
+    ) -> models.UP:
+        """
+        Update a user.
+
+        Triggers the on_after_update handler on success
+
+        :param user_update: The UserUpdate model containing
+        the changes to apply to the user.
+        :param user: The current user to update.
+        :param safe: If True, sensitive values like is_superuser or is_verified
+        will be ignored during the update, defaults to False
+        :param request: Optional FastAPI request that
+        triggered the operation, defaults to None.
+        :return: The updated user.
+        """
+        if safe:
+            updated_user_data = user_update.create_update_dict()
+            if "phone_no" in updated_user_data and user.phone_no != updated_user_data["phone_no"]:
+                updated_user_data["is_phone_verified"] = False
+            if "email" in updated_user_data and user.email != updated_user_data["email"]:
+                updated_user_data["is_email_verified"] = False
+        else:
+            updated_user_data = user_update.create_update_dict_superuser()
+        updated_user = await self._update(user, updated_user_data)
+        await self.on_after_update(updated_user, updated_user_data, request)
+        return updated_user

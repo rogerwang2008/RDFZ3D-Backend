@@ -26,3 +26,21 @@ Authorization: Bearer {{token}}
 ### 获取用户信息
 GET {{host}}{{auth_prefix}}/me
 Authorization: Bearer {{token}}
+
+### 修改自己的手机号
+PATCH {{host}}{{auth_prefix}}/me
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+  "phone_no": "+86 135-1128-8028"
+}
+
+### 修改自己的邮箱
+PATCH {{host}}{{auth_prefix}}/me
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+  "email": " {{$random.email}}"
+}
