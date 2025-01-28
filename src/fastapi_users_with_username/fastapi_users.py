@@ -7,6 +7,17 @@ from . import schemas, router, models
 
 
 class FastAPIUsers(fastapi_users.FastAPIUsers[models.UP, fastapi_users.models.ID]):
+    def get_register_router(
+            self, user_schema: Type[schemas.U], user_create_schema: Type[schemas.UC]
+    ) -> fastapi.APIRouter:
+        """
+        Return a router with a register route.
+
+        :param user_schema: Pydantic schema of a public user.
+        :param user_create_schema: Pydantic schema for creating a user.
+        """
+        return router.get_register_router(self.get_user_manager, user_schema, user_create_schema)
+
     def get_verify_router(self, user_schema: Type[schemas.U]) -> fastapi.APIRouter:
         """
         Return a router with e-mail verification routes.
