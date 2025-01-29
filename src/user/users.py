@@ -1,6 +1,6 @@
-from typing import Optional, AsyncGenerator, Union
+from typing import Optional, AsyncGenerator, Any
 import re
-
+import ulid
 from fastapi import Depends, Request
 import fastapi_users
 import fastapi_users.authentication
@@ -17,7 +17,8 @@ import universal.config
 SECRET = universal.config.settings.SECRET_KEY
 
 
-class UserManager(fastapi_users.UUIDIDMixin, fastapi_users_with_username.BaseUserManager[db.User, schemas.ID_TYPE]):
+class UserManager(fastapi_users_with_username.ULIDIDMixin,
+                  fastapi_users_with_username.BaseUserManager[db.User, schemas.ID_TYPE]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 

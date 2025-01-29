@@ -10,7 +10,7 @@ class User(fastapi_users_with_username.db.SQLModelBaseUserDB, table=True):
     pass
 
 
-class AccessToken(fastapi_users_db_sqlmodel.access_token.SQLModelBaseAccessToken, table=True):
+class AccessToken(fastapi_users_with_username.db.SQLModelBaseAccessToken, table=True):
     pass
 
 
