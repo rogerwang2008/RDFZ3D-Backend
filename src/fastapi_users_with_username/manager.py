@@ -1,7 +1,8 @@
-from typing import Optional, Union
+from typing import Optional, Union, Any
 import fastapi.security
 import fastapi_users.jwt
 import jwt.exceptions
+import ulid
 from fastapi import Request
 import fastapi_users
 
@@ -235,3 +236,13 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         :return: None if the username is valid.
         """
         return
+
+
+class ULIDIDMixin:
+    def parse_id(self, value: Any) -> ulid.ULID:
+        if isinstance(value, ulid.ULID):
+            return value
+        try:
+            return ulid.ULID.parse(value)
+        except ValueError as e:
+            raise fastapi_users.exceptions.InvalidID() from e

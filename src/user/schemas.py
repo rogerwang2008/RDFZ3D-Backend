@@ -1,8 +1,8 @@
-import uuid
+import ulid
 
 import fastapi_users_with_username
 
-ID_TYPE = uuid.UUID
+ID_TYPE = ulid.ULID  # 写死了 千万别想着改回 UUID 了
 
 
 class UserRead(fastapi_users_with_username.schemas.BaseUser[ID_TYPE]):

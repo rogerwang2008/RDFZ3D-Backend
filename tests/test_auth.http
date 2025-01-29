@@ -3,9 +3,9 @@ POST {{host}}{{auth_prefix}}/register
 content-type: application/json
 
 {
-  "username": "zhangliu",
-  "email": "zhangsi@example.com",
-  "phone_no": "19898989898",
+  "username": "zhangsan",
+  "email": "{{$random.email}}",
+  "phone_no": "19898009808",
   "password": "password"
 }
 
