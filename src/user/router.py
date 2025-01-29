@@ -6,7 +6,6 @@ from . import db, schemas, users
 from universal import database
 from . import db, schemas, users
 
-
 router = APIRouter()
 
 # @router.get("/get_user_info", response_model=schemas.User)
