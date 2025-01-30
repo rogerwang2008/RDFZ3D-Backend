@@ -10,7 +10,7 @@ router = APIRouter()
 
 # @router.get("/get_user_info", response_model=schemas.User)
 router.include_router(
-    users.fastapi_users_obj.get_auth_router(users.auth_backend),
+    users.fastapi_users_obj.get_custom_auth_router(users.auth_backend, schemas.UserLogin),
     prefix="",
 )
 

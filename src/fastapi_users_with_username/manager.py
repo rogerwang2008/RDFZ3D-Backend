@@ -80,7 +80,7 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         return created_user
 
     async def authenticate(
-            self, credentials: fastapi.security.OAuth2PasswordRequestForm
+            self, credentials: fastapi.security.OAuth2PasswordRequestForm | schemas.UL,
     ) -> Optional[models.UP]:
         """
         Authenticate and return a user following an email and a password.
