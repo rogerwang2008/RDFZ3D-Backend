@@ -1,0 +1,22 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  run_pull:
+    name: Run pull on XWay's server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH Keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.XWAY_SERVER_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.XWAY_SERVER_HOST }} > ~/.ssh/known_hosts
+      - name: Connect and pull
+        run: ssh root@${{ secrets.XWAY_SERVER_HOST }} "cd ${{ secrets.XWAY_SERVER_DEPLOY_DIR }} && git checkout master && git pull github master && exit"
+      - name: Cleanup
+        run: rm -rf ~/.ssh
