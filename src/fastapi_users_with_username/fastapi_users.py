@@ -1,7 +1,7 @@
 from typing import Type
 
 import fastapi
-import fastapi_users
+import fastapi_users.authentication
 
 from . import schemas, router, models
 
@@ -24,4 +24,26 @@ class FastAPIUsers(fastapi_users.FastAPIUsers[models.UP, fastapi_users.models.ID
 
         :param user_schema: Pydantic schema of a public user.
         """
-        return router.verify.get_verify_router(self.get_user_manager, user_schema)
+        return router.get_verify_router(self.get_user_manager, user_schema)
+
+    def get_custom_auth_router(
+            self,
+            backend: fastapi_users.authentication.AuthenticationBackend,
+            user_login_schema: Type[schemas.UL],
+            requires_verification: bool = False
+    ) -> fastapi.APIRouter:
+        """
+        Return an auth router for a given authentication backend.
+
+        :param backend: The authentication backend instance.
+        :param user_login_schema: Pydantic schema for user logging in.
+        :param requires_verification: Whether the authentication
+        require the user to be verified or not. Defaults to False.
+        """
+        return router.get_auth_router(
+            backend,
+            self.get_user_manager,
+            self.authenticator,
+            user_login_schema,
+            requires_verification,
+        )
