@@ -77,6 +77,12 @@ class BaseUserUpdate(CreateUpdateDictModel):
     is_phone_verified: bool = None
 
 
+class BaseUserLogin(pydantic.BaseModel):
+    username: str
+    password: str
+
+
 U = TypeVar("U", bound=BaseUser)
 UC = TypeVar("UC", bound=BaseUserCreate)
 UU = TypeVar("UU", bound=BaseUserUpdate)
+UL = TypeVar("UL", bound=BaseUserLogin)
