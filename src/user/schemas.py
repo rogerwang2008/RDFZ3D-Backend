@@ -1,3 +1,5 @@
+from typing import Optional
+
 import ulid
 
 import fastapi_users_with_username
@@ -15,4 +17,8 @@ class UserCreate(fastapi_users_with_username.schemas.BaseUserCreate):
 
 class UserUpdate(fastapi_users_with_username.schemas.BaseUserUpdate):
     pass
+
+
+class UserLogin(fastapi_users_with_username.schemas.BaseUserLogin):
+    client_type: Optional[str] = None
 
