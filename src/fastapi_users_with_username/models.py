@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Protocol, TypeVar
+from typing import Optional, Protocol, TypeVar
 
 import fastapi_users.models
 

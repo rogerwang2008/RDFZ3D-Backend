@@ -1,5 +1,3 @@
-from typing import Annotated
-
 import fastapi
 
 import fastapi_users.authentication, fastapi_users.openapi, fastapi_users.router

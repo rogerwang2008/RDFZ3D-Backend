@@ -239,6 +239,7 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
 
 
 class ULIDIDMixin:
+    # noinspection PyMethodMayBeStatic
     def parse_id(self, value: Any) -> ulid.ULID:
         if isinstance(value, ulid.ULID):
             return value
