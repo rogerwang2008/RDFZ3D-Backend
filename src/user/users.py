@@ -1,18 +1,16 @@
-from typing import Optional, AsyncGenerator, Any
+from typing import Optional, AsyncGenerator
 import re
-import ulid
 from fastapi import Depends, Request
 import fastapi_users
 import fastapi_users.authentication
 import fastapi_users_db_sqlmodel
-from fastapi_users import models
 
 import fastapi_users_with_username
 import fastapi_users_with_username.exceptions
 
+import universal.config
 from . import db
 from . import schemas
-import universal.config
 
 SECRET = universal.config.settings.SECRET_KEY
 

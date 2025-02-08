@@ -48,6 +48,7 @@ def get_reset_password_router(
         user_manager: fastapi_users.manager.BaseUserManager[fastapi_users.models.UP, fastapi_users.models.ID] = Depends(get_user_manager),
     ):
         try:
+            # noinspection PyTypeChecker
             user = await user_manager.get_by_email(email)
         except fastapi_users.exceptions.UserNotExists:
             return None
