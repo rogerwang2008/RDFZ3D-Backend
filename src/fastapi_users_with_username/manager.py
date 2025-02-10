@@ -1,10 +1,10 @@
 from typing import Optional, Union, Any
 import fastapi.security
+import fastapi_users
 import fastapi_users.jwt
 import jwt.exceptions
 import ulid
 from fastapi import Request
-import fastapi_users
 
 from . import models, db, schemas, common, exceptions
 
@@ -49,6 +49,8 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         :raises UserWithIdentifierAlreadyExists: A user already exists with the same e-mail/....
         :return: A new user.
         """
+        user_create.username = user_create.username.strip()
+        await self.validate_username(user_create.username, user_create)
         await self.validate_password(user_create.password, user_create)
 
         existing_user_with_username = await self.user_db.get_by_username(user_create.username)
