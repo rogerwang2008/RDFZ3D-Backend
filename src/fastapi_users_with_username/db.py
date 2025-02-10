@@ -3,12 +3,17 @@ from typing import TYPE_CHECKING, Optional
 import fastapi_users_db_sqlmodel.access_token
 import sqlalchemy.sql.schema
 import ulid
-
+import re
+import pydantic.networks
+from pydantic_core import PydanticCustomError
 from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
+import phonenumbers
 import sqlmodel
 from sqlalchemy import func
 import fastapi_users_db_sqlmodel
+
+from . import models
 
 PhoneNumber.default_region_code = "CN"
 PhoneNumber.phone_format = "E164"
@@ -45,8 +50,22 @@ class SQLModelBaseAccessToken(fastapi_users_db_sqlmodel.access_token.SQLModelBas
 
 
 class SQLModelUserDatabaseAsync(fastapi_users_db_sqlmodel.SQLModelUserDatabaseAsync):
-    async def get_by_phone_no(self, phone_no: str):
+    async def get_by_email(self, email: str) -> Optional[models.UP]:
+        """Get a single user by email."""
+        email = pydantic.networks.validate_email(email)[1]
+        statement = sqlmodel.select(self.user_model).where(  # type: ignore
+            func.lower(self.user_model.email) == func.lower(email)
+        )
+        results = await self.session.execute(statement)
+        obj = results.first()
+        if obj is None:
+            return None
+        return obj[0]
+
+    async def get_by_phone_no(self, phone_no: str) -> Optional[models.UP]:
         """Get a single user by phone number."""
+        phone_no = phonenumbers.format_number(phonenumbers.parse(phone_no, PhoneNumber.default_region_code),
+                                              getattr(phonenumbers.PhoneNumberFormat, PhoneNumber.phone_format))
         statement = sqlmodel.select(self.user_model).where(
             self.user_model.phone_no == phone_no
         )
@@ -56,10 +75,11 @@ class SQLModelUserDatabaseAsync(fastapi_users_db_sqlmodel.SQLModelUserDatabaseAs
             return None
         return obj[0]
 
-    async def get_by_username(self, username: str):
+    async def get_by_username(self, username: str) -> Optional[models.UP]:
         """Get a single user by username."""
+        username = username.strip().lower()
         statement = sqlmodel.select(self.user_model).where(
-            func.lower(self.user_model.username) == func.lower(username)
+            func.lower(self.user_model.username) == username
         )
         results = await self.session.execute(statement)
         obj = results.first()
@@ -69,13 +89,18 @@ class SQLModelUserDatabaseAsync(fastapi_users_db_sqlmodel.SQLModelUserDatabaseAs
 
     async def get_by_any_identifier(self, identifier: str):
         """Get a single user by username or email or phone number."""
-        statement = sqlmodel.select(self.user_model).where(
-            (func.lower(self.user_model.username) == func.lower(identifier))
-            | (func.lower(self.user_model.email) == func.lower(identifier))
-            | (self.user_model.phone_no == identifier)
-        )
-        results = await self.session.execute(statement)
-        obj = results.first()
-        if obj is None:
-            return None
-        return obj[0]
+        if '@' in identifier:
+            try:
+                return await self.get_by_email(identifier)
+            except PydanticCustomError:
+                return None
+        elif re.match(r'[+\-]', identifier):
+            try:
+                return await self.get_by_phone_no(identifier)
+            except phonenumbers.NumberParseException:
+                return None
+        else:
+            try:
+                return await self.get_by_username(identifier) or await self.get_by_phone_no(identifier)
+            except phonenumbers.NumberParseException:
+                return None
