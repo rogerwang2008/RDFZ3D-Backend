@@ -1,14 +1,19 @@
 from typing import Optional, AsyncGenerator
 import re
-from fastapi import Depends, Request
+
+import sqlmodel
+from fastapi import Depends, Request, Response
 import fastapi_users
 import fastapi_users.authentication
 import fastapi_users_db_sqlmodel
+from fastapi_users import models
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 import fastapi_users_with_username
 import fastapi_users_with_username.exceptions
 
 import universal.config
+import universal.database
 from . import db
 from . import schemas
 
@@ -32,6 +37,38 @@ class UserManager(fastapi_users_with_username.ULIDIDMixin,
             self, user: db.User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+
+    async def on_after_login(self, user: models.UP, request: Optional[Request] = None,
+                             response: Optional[Response] = None, ) -> None:
+        # noinspection PyProtectedMember
+        login_info = schemas.UserLogin.model_validate(request._json)
+        token_info = fastapi_users.authentication.transport.bearer.BearerResponse.model_validate_json(response.body)
+        db_session = await anext(universal.database.get_async_session())
+        # noinspection PyTypeChecker
+        token_obj = await db_session.exec(sqlmodel.select(db.AccessToken).where(db.AccessToken.token == token_info.access_token))
+        token_obj = token_obj.one()
+        token_obj.client_type = login_info.client_type
+        await db_session.commit()
+        if login_info.unique:
+            await self.check_token_uniqueness(db_session, token_info.access_token, user.id, login_info.client_type)
+
+    async def check_token_uniqueness(self, db_session: AsyncSession, token: str, user_id: str, client_type: Optional[str]):
+        if client_type is None:
+            # noinspection PyTypeChecker
+            statement = sqlmodel.delete(db.AccessToken).where(
+                (db.AccessToken.user_id == user_id)
+                & (db.AccessToken.token != token)
+            )
+        else:
+            # noinspection PyTypeChecker
+            statement = sqlmodel.delete(db.AccessToken).where(
+                (db.AccessToken.user_id == user_id)
+                & (db.AccessToken.client_type == client_type)
+                & (db.AccessToken.token != token)
+            )
+        # 删除已有
+        await db_session.exec(statement)
+        await db_session.commit()
 
     async def validate_username(self, username: str, _) -> None:
         if not re.match(r"^[a-zA-Z0-9_]+$", username):
