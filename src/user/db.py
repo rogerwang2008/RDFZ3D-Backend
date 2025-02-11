@@ -1,3 +1,5 @@
+from typing import Optional, Generator
+
 import fastapi
 from sqlmodel.ext.asyncio.session import AsyncSession
 import fastapi_users_db_sqlmodel.access_token
@@ -11,7 +13,7 @@ class User(fastapi_users_with_username.db.SQLModelBaseUserDB, table=True):
 
 
 class AccessToken(fastapi_users_with_username.db.SQLModelBaseAccessToken, table=True):
-    pass
+    client_type: Optional[str]
 
 
 async def get_user_db(session: AsyncSession = fastapi.Depends(database.get_async_session)):

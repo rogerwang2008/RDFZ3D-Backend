@@ -1,3 +1,4 @@
+uvicorn~=0.34.0
 pydantic~=2.10.5
 sqlmodel~=0.0.22
 fastapi~=0.115.6
@@ -5,6 +6,7 @@ pydantic-settings~=2.7.1
 asyncmy~=0.2.10
 SQLAlchemy~=2.0.37
 fastapi-users~=14.0.1
+fastapi_limiter~=0.1.6
 fastapi_users_db_sqlmodel~=0.3.0
 phonenumbers~=8.13.53
 python-ulid~=3.0.0
