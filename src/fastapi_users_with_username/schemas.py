@@ -34,10 +34,10 @@ class BaseUser(CreateUpdateDictModel, Generic[models.ID]):
     id: fastapi_users.models.ID
     username: str
     if TYPE_CHECKING:
-        email: Optional[str]
+        email: Optional[str] = None
     else:
-        email: Optional[EmailStr]
-    phone_no: Optional[PhoneNumber]
+        email: Optional[EmailStr] = None
+    phone_no: Optional[PhoneNumber] = None
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
@@ -50,10 +50,10 @@ class BaseUser(CreateUpdateDictModel, Generic[models.ID]):
 class BaseUserCreate(CreateUpdateDictModel):
     username: str
     if TYPE_CHECKING:
-        email: Optional[str]
+        email: Optional[str] = None
     else:
-        email: Optional[EmailStr]
-    phone_no: Optional[PhoneNumber]
+        email: Optional[EmailStr] = None
+    phone_no: Optional[PhoneNumber] = None
     password: str
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
