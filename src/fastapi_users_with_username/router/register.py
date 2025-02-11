@@ -1,3 +1,6 @@
+from typing import Optional
+
+import fastapi
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 import fastapi_users
@@ -11,6 +14,7 @@ def get_register_router(
         get_user_manager: fastapi_users.manager.UserManagerDependency[models.UP, models.ID],
         user_schema: type[schemas.U],
         user_create_schema: type[schemas.UC],
+        description: Optional[str] = None,
 ) -> APIRouter:
     """Generate a router with the register route."""
     router = APIRouter()
@@ -20,6 +24,7 @@ def get_register_router(
         response_model=user_schema,
         status_code=status.HTTP_201_CREATED,
         name="register:register",
+        description=description,
         responses={
             status.HTTP_400_BAD_REQUEST: {
                 "model": fastapi_users.router.common.ErrorModel,
