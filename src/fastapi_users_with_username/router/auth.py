@@ -1,3 +1,5 @@
+from typing import Optional
+
 import fastapi
 
 import fastapi_users.authentication, fastapi_users.openapi, fastapi_users.router
@@ -10,6 +12,8 @@ def get_auth_router(
         authenticator: fastapi_users.authentication.Authenticator[fastapi_users.models.UP, fastapi_users.models.ID],
         user_login_schema: type[schemas.UL],
         requires_verification: bool = False,
+        login_description: Optional[str] = None,
+        logout_description: Optional[str] = None,
 ) -> fastapi.APIRouter:
     """Generate a router with login/logout routes for an authentication backend."""
     router = fastapi.APIRouter()
@@ -42,6 +46,7 @@ def get_auth_router(
         "/login",
         name=f"auth:{backend.name}.login",
         responses=login_responses,
+        description=login_description,
     )
     async def login(
             request: fastapi.Request,
@@ -77,7 +82,7 @@ def get_auth_router(
     }
 
     @router.post(
-        "/logout", name=f"auth:{backend.name}.logout", responses=logout_responses
+        "/logout", name=f"auth:{backend.name}.logout", responses=logout_responses, description=logout_description
     )
     async def logout(
             user_token: tuple[fastapi_users.models.UP, str] = fastapi.Depends(get_current_user_token),
