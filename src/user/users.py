@@ -5,7 +5,6 @@ import sqlmodel
 from fastapi import Depends, Request, Response
 import fastapi_users
 import fastapi_users.authentication
-import fastapi_users_db_sqlmodel
 from fastapi_users import models
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -90,7 +89,7 @@ class UserManager(fastapi_users_with_username.ULIDIDMixin,
             raise fastapi_users.exceptions.InvalidPasswordException("Password can't be longer than 100 characters.")
 
 
-async def get_user_manager(user_db: fastapi_users_db_sqlmodel.SQLModelUserDatabaseAsync = Depends(db.get_user_db)) \
+async def get_user_manager(user_db: fastapi_users_with_username.db.SQLModelUserDatabaseAsync = Depends(db.get_user_db)) \
         -> AsyncGenerator[UserManager, None]:
     yield UserManager(user_db)
 
