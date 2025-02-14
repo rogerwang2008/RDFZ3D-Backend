@@ -42,16 +42,17 @@ class UserManager(fastapi_users_with_username.ULIDIDMixin,
         # noinspection PyProtectedMember
         login_info = schemas.UserLogin.model_validate(request._json)
         token_info = fastapi_users.authentication.transport.bearer.BearerResponse.model_validate_json(response.body)
-        db_session = await anext(universal.database.get_async_session())
-        # noinspection PyTypeChecker
-        token_obj = await db_session.exec(sqlmodel.select(db.AccessToken).where(db.AccessToken.token == token_info.access_token))
-        token_obj = token_obj.one()
-        token_obj.client_type = login_info.client_type
-        await db_session.commit()
-        if login_info.unique:
-            await self.check_token_uniqueness(db_session, token_info.access_token, user.id, login_info.client_type)
+        async for db_session in universal.database.get_async_session():
+            # noinspection PyTypeChecker
+            token_obj = await db_session.exec(sqlmodel.select(db.AccessToken).where(db.AccessToken.token == token_info.access_token))
+            token_obj = token_obj.one()
+            token_obj.client_type = login_info.client_type
+            await db_session.commit()
+            if login_info.unique:
+                await self.check_token_uniqueness(db_session, token_info.access_token, user.id, login_info.client_type)
 
-    async def check_token_uniqueness(self, db_session: AsyncSession, token: str, user_id: str, client_type: Optional[str]):
+    @staticmethod
+    async def check_token_uniqueness(db_session: AsyncSession, token: str, user_id: str, client_type: Optional[str]):
         if client_type is None:
             # noinspection PyTypeChecker
             statement = sqlmodel.delete(db.AccessToken).where(

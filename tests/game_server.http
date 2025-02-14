@@ -1,0 +1,13 @@
+### Create a new game server
+POST {{host}}/game_server/
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+  "address": "localhost:{{$random.integer}}",
+  "name": "Server {{$random.integer}}",
+  "description": "",
+  "reporter_host": "{{$random.internet.ipV4Address}}",
+  "detail": "1a23"
+}
+
