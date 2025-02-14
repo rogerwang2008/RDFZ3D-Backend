@@ -27,4 +27,4 @@ async def say_hello(name: str = "World"):
 
 
 app.include_router(user.router, prefix="/auth", tags=["auth"])
-app.include_router(game_server.router, prefix="/game_server", tags=["game_server"])
+app.include_router(game_server.router, prefix="/game_server", tags=["Game server"])

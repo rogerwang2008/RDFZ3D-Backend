@@ -11,3 +11,34 @@ content-type: application/json
   "detail": "1a23"
 }
 
+### Get server
+GET {{host}}/game_server/4
+Authorization: Bearer {{token}}
+
+### Patch server #1
+PATCH {{host}}/game_server/1
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+  "name": "Server 1",
+  "description": "Server 1",
+  "reporter_host": "127.0.0.1",
+  "detail": "qwewewe"
+}
+
+### Delete server #1
+DELETE {{host}}/game_server/3
+Authorization: Bearer {{token}}
+
+
+### Report
+POST {{host}}/game_server/report/4
+User-Agent: Rdfz3D HTTP Client
+content-type: application/json
+
+{
+  "player_count": 1,
+  "max_player_count": 10,
+  "state": "running"
+}

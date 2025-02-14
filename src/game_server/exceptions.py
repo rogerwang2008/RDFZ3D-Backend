@@ -2,5 +2,9 @@ class GameServerNotFound(Exception):
     pass
 
 
-class HostMismatch(Exception):
+class PermissionDenied(Exception):
+    pass
+
+
+class ReporterHostMismatch(Exception):
     pass

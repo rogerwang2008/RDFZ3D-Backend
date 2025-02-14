@@ -1,15 +1,8 @@
 from typing import Optional
 
-import datetime
-import json
-import fastapi
 import sqlalchemy
 from sqlalchemy.dialects.mysql import LONGTEXT
 import sqlmodel
-import pydantic
-
-import universal.database
-from . import common
 
 
 class GameServerId(sqlmodel.SQLModel):
@@ -36,10 +29,3 @@ class GameServer(GameServerPublic, GameServerId, table=True):
     reporter_host: str
 
 
-class GameServerStatusBase(pydantic.BaseModel):
-    player_count: int = pydantic.Field(default=0, ge=0)
-    state: common.GameServerState = pydantic.Field(default=common.GameServerState.STOPPED)
-
-
-class GameServerStatus(GameServerStatusBase):
-    last_updated: Optional[pydantic.AwareDatetime] = pydantic.Field(default_factory=datetime.datetime.now)

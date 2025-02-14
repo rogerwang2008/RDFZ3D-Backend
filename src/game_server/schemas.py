@@ -2,7 +2,9 @@ from typing import Optional
 import pydantic
 from pydantic.networks import IPvAnyAddress
 
-from . import models, common
+from . import models
+from .status.common import GameServerStateEnum
+from .status.models import GameServerStatusBase, GameServerStatus
 
 
 class GameServerCreate(models.GameServerBase):
@@ -20,17 +22,12 @@ class GameServerUpdate(models.GameServerBase):
 
 class GameServerRead(models.GameServerPublic, models.GameServerId):
     """读取游戏服务器信息的 schema"""
-    status: models.GameServerStatusBase = pydantic.Field(
-        default=models.GameServerStatusBase(player_count=0, state=common.GameServerState.STOPPED))
+    status: GameServerStatusBase = pydantic.Field(
+        default=GameServerStatusBase(player_count=0, state=GameServerStateEnum.STOPPED))
 
 
 class GameServerReadAdmin(models.GameServerPublic, models.GameServerId, table=False):
     """管理员读取游戏服务器信息的 schema"""
     reporter_host: IPvAnyAddress
-    status: models.GameServerStatus = pydantic.Field(
-        default=models.GameServerStatus(player_count=0, state=common.GameServerState.STOPPED, last_updated=None))
-
-
-class GameServerReport(models.GameServerStatusBase, models.GameServerId):
-    """游戏服务器上报状态的 schema"""
-    pass
+    status: GameServerStatus = pydantic.Field(
+        default=GameServerStatus(player_count=0, state=GameServerStateEnum.STOPPED, last_updated=None))
