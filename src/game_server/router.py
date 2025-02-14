@@ -17,7 +17,7 @@ router.include_router(status.router)
 async def create_game_server(
         game_server: schemas.GameServerCreate,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
-            user.utils.get_current_active_verified_user_optional),
+            user.utils.dependencies.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerReadAdmin:
     print(current_user)
@@ -29,7 +29,7 @@ async def get_game_servers(
         skip: int = fastapi.Query(default=0, ge=0, description="跳过前_个"),
         limit: int = fastapi.Query(default=100, ge=1, description="返回_个"),
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
-            user.utils.get_current_active_verified_user_optional),
+            user.utils.dependencies.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> list[schemas.GameServerRead] | list[schemas.GameServerReadAdmin]:
     return await aiostream.stream.list(crud.read_game_servers(db_session, current_user, skip, limit))
@@ -44,7 +44,7 @@ async def get_game_servers(
 async def get_game_server(
         game_server_id: int,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
-            user.utils.get_current_active_verified_user_optional),
+            user.utils.dependencies.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerRead | schemas.GameServerReadAdmin:
     try:
@@ -58,7 +58,7 @@ async def update_game_server(
         game_server_id: int,
         game_server: schemas.GameServerUpdate,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
-            user.utils.get_current_active_verified_user_optional),
+            user.utils.dependencies.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerReadAdmin:
     try:
@@ -73,7 +73,7 @@ async def update_game_server(
 async def delete_game_server(
         game_server_id: int,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
-            user.utils.get_current_active_verified_user_optional),
+            user.utils.dependencies.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> None:
     try:

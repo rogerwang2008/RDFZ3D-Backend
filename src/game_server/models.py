@@ -19,8 +19,8 @@ class GameServerBase(sqlmodel.SQLModel):
 
 class GameServerPublic(GameServerBase):
     # noinspection PyTypeChecker
-    admin: Optional[str] = sqlmodel.Field(foreign_key="user.id", nullable=True, sa_type=sqlalchemy.CHAR(26),
-                                          default=None)
+    admin_id: Optional[str] = sqlmodel.Field(foreign_key="user.id", nullable=True, sa_type=sqlalchemy.CHAR(26),
+                                             default=None)
 
 
 class GameServer(GameServerPublic, GameServerId, table=True):

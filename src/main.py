@@ -6,10 +6,13 @@ import user
 import game_server
 import universal.database, universal.config
 
+from scheduler import scheduler
+
 
 @contextlib.asynccontextmanager
 async def lifespan(_: FastAPI):
     await universal.database.create_db_and_tables()
+    scheduler.start()
     yield
 
 
