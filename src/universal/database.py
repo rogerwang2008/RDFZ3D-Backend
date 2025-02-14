@@ -8,7 +8,6 @@ from .config import settings
 
 connect_args = {}
 engine = create_async_engine(settings.DATABASE_URI, echo=True, connect_args=connect_args)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
 async def create_db_and_tables():
