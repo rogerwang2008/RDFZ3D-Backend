@@ -1,5 +1,5 @@
 from typing import Optional
-
+import aiostream
 import fastapi
 from fastapi import APIRouter
 
@@ -7,11 +7,13 @@ import fastapi_users_with_username
 import universal.database
 import user.utils
 from . import crud, exceptions, schemas
+from . import status
 
 router = APIRouter()
 
+router.include_router(status.router)
 
-@router.post("/")
+@router.post("/", status_code=fastapi.status.HTTP_201_CREATED)
 async def create_game_server(
         game_server: schemas.GameServerCreate,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
@@ -30,7 +32,7 @@ async def get_game_servers(
             user.utils.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> list[schemas.GameServerRead] | list[schemas.GameServerReadAdmin]:
-    return await crud.read_game_servers(db_session, current_user, skip, limit)
+    return await aiostream.stream.list(crud.read_game_servers(db_session, current_user, skip, limit))
 
 
 @router.get(
@@ -45,9 +47,38 @@ async def get_game_server(
             user.utils.get_current_active_verified_user_optional),
         db_session=fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerRead | schemas.GameServerReadAdmin:
-    result = await crud.read_game_server(db_session, current_user, game_server_id)
-    if result is None:
+    try:
+        return await crud.read_game_server(db_session, current_user, game_server_id)
+    except exceptions.GameServerNotFound:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
-    return result
 
 
+@router.patch("/{game_server_id}")
+async def update_game_server(
+        game_server_id: int,
+        game_server: schemas.GameServerUpdate,
+        current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
+            user.utils.get_current_active_verified_user_optional),
+        db_session=fastapi.Depends(universal.database.get_async_session),
+) -> schemas.GameServerReadAdmin:
+    try:
+        return await crud.update_game_server(db_session, current_user, game_server_id, game_server)
+    except exceptions.GameServerNotFound:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
+    except exceptions.PermissionDenied:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_403_FORBIDDEN, detail="Not the admin or superuser")
+
+
+@router.delete("/{game_server_id}")
+async def delete_game_server(
+        game_server_id: int,
+        current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
+            user.utils.get_current_active_verified_user_optional),
+        db_session=fastapi.Depends(universal.database.get_async_session),
+) -> None:
+    try:
+        await crud.delete_game_server(db_session, current_user, game_server_id)
+    except exceptions.GameServerNotFound:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
+    except exceptions.PermissionDenied:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_403_FORBIDDEN, detail="Not the admin or superuser")

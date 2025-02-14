@@ -1,7 +1,7 @@
 import enum
 
 
-class GameServerState(enum.StrEnum):
+class GameServerStateEnum(enum.StrEnum):
     STOPPED = enum.auto()
     RUNNING = enum.auto()
     MAINTENANCE = enum.auto()
