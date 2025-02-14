@@ -1,4 +1,4 @@
-from . import users
+from .. import users
 
 get_current_user = users.fastapi_users_obj.current_user()
 get_current_active_user = users.fastapi_users_obj.current_user(active=True)

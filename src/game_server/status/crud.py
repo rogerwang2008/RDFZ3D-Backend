@@ -1,7 +1,6 @@
 import datetime
 from . import models, common, schemas
 
-
 reported_queue: list[int] = []
 reported_data: dict[int, models.GameServerStatus] = {}
 
@@ -55,3 +54,13 @@ def report_server_status(game_server_id: int, status: schemas.GameServerReport) 
     except ValueError:
         pass
     reported_queue.append(game_server_id)
+
+
+def cleanup_reported_data() -> None:
+    """
+    Cleanup the reported data.
+    :return:
+    """
+    print("Cleaning up reported data...")
+    while reported_queue and check_server_not_stopped(reported_queue[0]):
+        reported_queue.pop(0)
