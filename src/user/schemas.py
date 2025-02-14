@@ -22,4 +22,3 @@ class UserUpdate(fastapi_users_with_username.schemas.BaseUserUpdate):
 class UserLogin(fastapi_users_with_username.schemas.BaseUserLogin):
     client_type: Optional[str] = None
     unique: bool = False
-
