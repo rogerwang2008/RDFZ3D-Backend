@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from .config import settings
 
 connect_args = {}
-engine = create_async_engine(settings.DATABASE_URI, echo=True, connect_args=connect_args)
+engine = create_async_engine(settings.DATABASE_URI, echo=True, connect_args=connect_args, pool_recycle=3600)
 
 
 async def create_db_and_tables():
