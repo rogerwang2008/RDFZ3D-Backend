@@ -18,6 +18,7 @@ class GameServerUpdate(models.GameServerBase):
     name: Optional[str] = None
     description: Optional[str] = None
     detail: Optional[str] = None
+    reporter_host: Optional[IPvAnyAddress] = None
 
 
 class GameServerRead(models.GameServerPublic, models.GameServerId):
