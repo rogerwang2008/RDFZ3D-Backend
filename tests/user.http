@@ -19,3 +19,7 @@ Content-Type: application/json
   "birthday_public": true,
   "identity_public": true
 }
+
+
+### User full read
+GET {{host}}/user/01JMCHCZ7AH1RRWJAFFTBJVG2V

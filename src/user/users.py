@@ -24,6 +24,17 @@ class UserManager(fastapi_users_with_username.ULIDIDMixin,
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
+    async def get_safe(self, user_id: schemas.ID_TYPE) -> schemas.UserReadSafe:
+        user = await self.get(user_id)
+        if not user.is_active:
+            raise fastapi_users.exceptions.UserInactive()
+        result = schemas.UserReadSafe.model_validate(user, from_attributes=True)
+        if not user.is_phone_verified:
+            result.phone_no = None
+        if not user.is_email_verified:
+            result.email = None
+        return result
+
     async def on_after_register(self, user: db.User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
 
