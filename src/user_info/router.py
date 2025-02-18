@@ -87,3 +87,21 @@ async def create_user_full(user_full: schemas.UserFullCreate,
                 "reason": e.reason,
             },
         )
+
+@router.get(
+    "/{user_id}",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+    },
+)
+async def read_user_full(user_id: str,
+                  user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                  db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                  ) -> schemas.UserFullRead:
+    try:
+        return await crud.read_user_full(db_session, user_manager, user_id)
+    except fastapi_users.exceptions.UserNotExists:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )

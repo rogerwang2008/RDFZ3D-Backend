@@ -14,3 +14,7 @@ class UserFullCreate(models.UserInfoVisibility, models.UserInfoBase, user.schema
 
 class UserFullReadAdmin(models.UserInfo, user.schemas.UserRead, table=False):
     pass
+
+
+class UserFullRead(models.UserInfoBase, user.schemas.UserReadSafe):
+    pass
