@@ -1,7 +1,8 @@
-from typing import Any
+import datetime
+from typing import Any, Optional
 
 import user.schemas
-from . import models
+from . import models, common
 
 
 class UserInfoCreate(models.UserInfoVisibility, models.UserInfoBase):
@@ -18,3 +19,11 @@ class UserFullReadAdmin(models.UserInfo, user.schemas.UserRead, table=False):
 
 class UserFullRead(models.UserInfoBase, user.schemas.UserReadSafe):
     pass
+
+
+class UserFullUpdate(models.UserInfoVisibility, models.UserInfoBase, user.schemas.UserUpdate):
+    nickname: Optional[str] = None
+    real_name: Optional[str] = None
+    gender: Optional[common.GenderEnum] = None
+    birthday: Optional[datetime.date] = None
+    identity: Optional[str] = None

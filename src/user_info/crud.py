@@ -11,7 +11,8 @@ import user.users
 from . import schemas, models
 
 
-async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_found: bool = True):
+async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_found: bool = True) \
+        -> models.UserInfo | None:
     """
     Get a user info (no auth info) by id.
     :param db_session:
@@ -79,3 +80,22 @@ async def read_user_admin_with_id(db_session: AsyncSession,
                                   user_id: str, ) -> schemas.UserFullReadAdmin:
     user_auth = await user_manager.get(user_manager.parse_id(user_id))
     return await read_user_admin(db_session, user_auth)
+
+
+async def update_user(db_session: AsyncSession,
+                      user_manager: user.users.UserManager,
+                      user_auth: fastapi_users_with_username.models.UP,
+                      user_full_update: schemas.UserFullUpdate,
+                      request: Optional[fastapi.Request] = None, ) -> schemas.UserFullReadAdmin:
+    updated_user_auth = await user_manager.update(
+        user.schemas.UserUpdate.model_validate(user_full_update.model_dump(exclude_unset=True)),
+        user_auth, True, request)
+    user_info = await get_user_info(db_session, user_auth.id)
+    update_info = user_full_update.model_dump(exclude_unset=True)
+    for key, value in update_info.items():
+        try:
+            setattr(user_info, key, value)
+        except ValueError:
+            continue
+    await db_session.commit()
+    return schemas.UserFullReadAdmin.model_validate(updated_user_auth.model_dump() | user_info.model_dump())
