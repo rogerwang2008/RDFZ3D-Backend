@@ -23,6 +23,7 @@ class UserInfoBase(sqlmodel.SQLModel):
 class UserInfoVisibility(sqlmodel.SQLModel):
     email_public: bool = False
     phone_no_public: bool = False
+    is_superuser_public: bool = True
     real_name_public: bool = True
     gender_public: bool = True
     birthday_public: bool = True

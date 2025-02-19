@@ -28,3 +28,13 @@ GET {{host}}/user/01JMCHCZ7AH1RRWJAFFTBJVG2V
 ### User read me
 GET {{host}}/user/me
 Authorization: Bearer {{token}}
+
+
+### User patch me
+PATCH {{host}}/user/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nickname": "测试12333"
+}

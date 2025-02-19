@@ -193,6 +193,35 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
 
         return verified_user
 
+    async def _update(self, user: models.UP, update_dict: dict[str, Any]) -> models.UP:
+        validated_update_dict = {}
+        for field, value in update_dict.items():
+            if field == "username" and value != user.username:
+                try:
+                    await self.get_by_username(value)
+                    await self.validate_username(value, user)
+                    raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.USERNAME)
+                except fastapi_users.exceptions.UserNotExists:
+                    validated_update_dict["username"] = value
+            elif field == "email" and value != user.email:
+                try:
+                    await self.get_by_email(value)
+                    raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.EMAIL)
+                except fastapi_users.exceptions.UserNotExists:
+                    validated_update_dict["email"] = value
+            elif field == "phone_no" and value != user.phone_no:
+                try:
+                    await self.get_by_phone_no(value)
+                    raise exceptions.UserWithIdentifierAlreadyExists(common.Identifiers.PHONE_NO)
+                except fastapi_users.exceptions.UserNotExists:
+                    validated_update_dict["phone_no"] = value
+            elif field == "password" and value is not None:
+                await self.validate_password(value, user)
+                validated_update_dict["hashed_password"] = self.password_helper.hash(value)
+            else:
+                validated_update_dict[field] = value
+        return await self.user_db.update(user, validated_update_dict)
+
     async def update(
             self,
             user_update: schemas.UU,
