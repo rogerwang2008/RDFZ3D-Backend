@@ -5,6 +5,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 import fastapi_users.exceptions
 
+import fastapi_users_with_username.models
 import user.schemas
 import user.users
 from . import schemas, models
@@ -27,11 +28,11 @@ async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_fou
     return user_info.one()
 
 
-async def create_user_full(db_session: AsyncSession,
-                           user_manager: user.users.UserManager,
-                           user_full_create: schemas.UserFullCreate,
-                           request: Optional[fastapi.Request] = None,
-                           ) -> schemas.UserFullReadAdmin:
+async def create_user(db_session: AsyncSession,
+                      user_manager: user.users.UserManager,
+                      user_full_create: schemas.UserFullCreate,
+                      request: Optional[fastapi.Request] = None,
+                      ) -> schemas.UserFullReadAdmin:
     """
     Create a user with full information.
     :param db_session:
@@ -51,9 +52,9 @@ async def create_user_full(db_session: AsyncSession,
     return schemas.UserFullReadAdmin.model_validate(final_user_info)
 
 
-async def read_user_full(db_session: AsyncSession,
-                         user_manager: user.users.UserManager,
-                         user_id: str, ) -> schemas.UserFullRead:
+async def read_user(db_session: AsyncSession,
+                    user_manager: user.users.UserManager,
+                    user_id: str, ) -> schemas.UserFullRead:
     user_auth = await user_manager.get_safe(user_manager.parse_id(user_id))
     user_info = await get_user_info(db_session, user_id)
     user_info_visibility = models.UserInfoVisibility.model_validate(user_info)
@@ -65,3 +66,16 @@ async def read_user_full(db_session: AsyncSession,
         field = key[:-7]  # Remove "_public"
         setattr(result, field, None)  # Also works with bool
     return result
+
+
+async def read_user_admin(db_session: AsyncSession,
+                          user_auth: fastapi_users_with_username.models.UP) -> schemas.UserFullReadAdmin:
+    user_info = await get_user_info(db_session, user_auth.id)
+    return schemas.UserFullReadAdmin.model_validate(user_auth.model_dump() | user_info.model_dump())
+
+
+async def read_user_admin_with_id(db_session: AsyncSession,
+                                  user_manager: user.users.UserManager,
+                                  user_id: str, ) -> schemas.UserFullReadAdmin:
+    user_auth = await user_manager.get(user_manager.parse_id(user_id))
+    return await read_user_admin(db_session, user_auth)

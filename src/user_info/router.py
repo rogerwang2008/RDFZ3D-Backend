@@ -7,12 +7,14 @@ import fastapi_users.router
 import fastapi_users_with_username.exceptions
 import fastapi_users_with_username.common
 import fastapi_users_with_username.router.common
-import user.users
+import user.users, user.utils.dependencies
 import universal.database
 from . import schemas, crud
 
 router = APIRouter()
 
+
+# region Register
 
 @router.post(
     "/",
@@ -56,13 +58,13 @@ router = APIRouter()
         },
     },
 )
-async def create_user_full(user_full: schemas.UserFullCreate,
-                           request: fastapi.Request,
-                           user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
-                           db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
-                           ) -> schemas.UserFullReadAdmin:
+async def create_user(user_full: schemas.UserFullCreate,
+                      request: fastapi.Request,
+                      user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                      db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                      ) -> schemas.UserFullReadAdmin:
     try:
-        return await crud.create_user_full(db_session, user_manager, user_full, request)
+        return await crud.create_user(db_session, user_manager, user_full, request)
     except fastapi_users_with_username.exceptions.UserWithIdentifierAlreadyExists as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -88,20 +90,46 @@ async def create_user_full(user_full: schemas.UserFullCreate,
             },
         )
 
+
+# endregion
+
+
+# region Private
+
+@router.get(
+    "/me",
+    responses={
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Missing token or inactive user"},
+    },
+)
+async def read_user_me(
+        user_auth: fastapi_users_with_username.models.UP = fastapi.Depends(
+            user.utils.dependencies.get_current_active_user),
+        db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+) -> schemas.UserFullReadAdmin:
+    return await crud.read_user_admin(db_session, user_auth)
+
+
+# endregion
+
+# region Public
+
 @router.get(
     "/{user_id}",
     responses={
         fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
 )
-async def read_user_full(user_id: str,
-                  user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
-                  db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
-                  ) -> schemas.UserFullRead:
+async def read_user(user_id: str,
+                    user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                    db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                    ) -> schemas.UserFullRead:
     try:
-        return await crud.read_user_full(db_session, user_manager, user_id)
+        return await crud.read_user(db_session, user_manager, user_id)
     except fastapi_users.exceptions.UserNotExists:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+
+# endregion

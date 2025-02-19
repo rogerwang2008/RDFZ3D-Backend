@@ -23,3 +23,8 @@ Content-Type: application/json
 
 ### User full read
 GET {{host}}/user/01JMCHCZ7AH1RRWJAFFTBJVG2V
+
+
+### User read me
+GET {{host}}/user/me
+Authorization: Bearer {{token}}
