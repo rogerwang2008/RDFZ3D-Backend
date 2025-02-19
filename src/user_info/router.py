@@ -118,6 +118,7 @@ async def read_user_me(
     "/{user_id}",
     responses={
         fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Inactive user"},
     },
 )
 async def read_user(user_id: str,
@@ -130,6 +131,11 @@ async def read_user(user_id: str,
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
+        )
+    except fastapi_users.exceptions.UserInactive:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Inactive user",
         )
 
 # endregion
