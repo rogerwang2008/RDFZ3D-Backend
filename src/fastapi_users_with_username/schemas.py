@@ -73,8 +73,8 @@ class BaseUserUpdate(CreateUpdateDictModel):
     is_active: Optional[bool] = None
     is_superuser: Optional[bool] = None
     is_verified: Optional[bool] = None
-    is_email_verified: bool = None
-    is_phone_verified: bool = None
+    is_email_verified: Optional[bool] = None
+    is_phone_verified: Optional[bool] = None
 
 
 class BaseUserLogin(pydantic.BaseModel):

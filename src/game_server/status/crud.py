@@ -61,6 +61,5 @@ def cleanup_reported_data() -> None:
     Cleanup the reported data.
     :return:
     """
-    print("Cleaning up reported data...")
     while reported_queue and check_server_not_stopped(reported_queue[0]):
         reported_queue.pop(0)

@@ -1,0 +1,52 @@
+### User Full Create
+POST {{host}}/user/
+Content-Type: application/json
+
+{
+  "username": "test001",
+  "email": "test001@example.com",
+  "phone_no": "18600000001",
+  "password": "password",
+  "nickname": "测试1",
+  "real_name": "测试",
+  "gender": 2,
+  "birthday": null,
+  "identity": null,
+  "email_public": false,
+  "phone_no_public": false,
+  "real_name_public": true,
+  "gender_public": true,
+  "birthday_public": true,
+  "identity_public": true
+}
+
+
+### User Full Create Random
+POST {{host}}/user/
+Content-Type: application/json
+
+{
+  "username": "TEST_RANDOM_{{$random.integer}}",
+  "email": "{{$random.email}}",
+  "phone_no": "139-0000-{{$random.integer(1000, 9999)}}",
+  "password": "password"
+}
+
+
+### User full read
+GET {{host}}/user/01JMCHCZ7AH1RRWJAFFTBJVG2V
+
+
+### User read me
+GET {{host}}/user/me
+Authorization: Bearer {{token}}
+
+
+### User patch me
+PATCH {{host}}/user/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nickname": "测试12333"
+}
