@@ -1,7 +1,6 @@
 from typing import Optional, AsyncGenerator
 
-import fastapi
-import sqlalchemy
+import sqlalchemy.exc
 import sqlmodel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -14,14 +13,14 @@ from . import status
 async def get_game_server(db_session: AsyncSession,
                           game_server_id: int,
                           current_user: Optional[fastapi_users_with_username.models.UP] = None,
-                          permission_check: bool = False,
+                          requires_admin: bool = False,
                           raise_on_not_found: bool = True) -> models.GameServer | None:
     """
     Get a game server by id.
     :param db_session:
     :param game_server_id:
     :param current_user: Only useful when permission_check is True
-    :param permission_check:
+    :param requires_admin:
     :param raise_on_not_found:
     :return:
     """
@@ -32,16 +31,41 @@ async def get_game_server(db_session: AsyncSession,
             raise exceptions.GameServerNotFound()
         return None
     game_server = game_server.one()
-    if permission_check:
+    if requires_admin:
         if not (current_user.is_superuser or game_server.admin_id == current_user.id):
             raise exceptions.PermissionDenied()
     return game_server
+
+
+async def get_game_server_by_address(db_session: AsyncSession,
+                                     game_server_address: str,
+                                     raise_on_not_found: bool = True) -> models.GameServer | None:
+    """
+    Get a game server by address.
+    :param db_session:
+    :param game_server_address:
+    :param raise_on_not_found:
+    :return:
+    """
+    statement = sqlmodel.select(models.GameServer).where(models.GameServer.address == game_server_address)
+    game_server = await db_session.exec(statement)
+    try:
+        return game_server.one()
+    except sqlalchemy.exc.NoResultFound:
+        if raise_on_not_found:
+            raise exceptions.GameServerNotFound()
+        return None
 
 
 async def create_game_server(db_session: AsyncSession,
                              creator: Optional[fastapi_users_with_username.models.UP],
                              game_server_create: schemas.GameServerCreate,
                              ) -> schemas.GameServerReadAdmin:
+    try:
+        await get_game_server_by_address(db_session, game_server_create.address)
+        raise exceptions.GameServerAlreadyExists("address")
+    except exceptions.GameServerNotFound:
+        pass
     info = game_server_create.model_dump()
     info["reporter_host"] = str(info["reporter_host"])
     info["admin"] = creator.id if creator else None

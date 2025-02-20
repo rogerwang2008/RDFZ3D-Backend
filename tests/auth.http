@@ -9,17 +9,6 @@ content-type: application/json
   "password": "password"
 }
 
-### 注册 lisi
-POST {{host}}/auth/register
-content-type: application/json
-
-{
-  "username": "lisi",
-  "email": "lisi@example.com",
-  "phone_no": null,
-  "password": "password"
-}
-
 ### 登录 zhangsan
 POST {{host}}/auth/login
 content-type: application/json

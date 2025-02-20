@@ -12,7 +12,7 @@ class GameServerId(sqlmodel.SQLModel):
 
 class GameServerBase(sqlmodel.SQLModel):
     address: str = sqlmodel.Field(index=True, unique=True)
-    name: str = sqlmodel.Field(index=True, unique=True)
+    name: str = sqlmodel.Field(index=True)
     description: Optional[str] = sqlmodel.Field(nullable=False, default="")
     detail: Optional[str] = sqlmodel.Field(default=None, sa_type=LONGTEXT)
 
@@ -27,5 +27,3 @@ class GameServer(GameServerPublic, GameServerId, table=True):
     __tablename__ = "game_server"
     id: Optional[int] = sqlmodel.Field(primary_key=True, default=None)
     reporter_host: str
-
-

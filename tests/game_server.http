@@ -4,7 +4,7 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-  "address": "localhost:{{$random.integer}}",
+  "address": "localhost:606",
   "name": "Server {{$random.integer}}",
   "description": "",
   "reporter_host": "{{$random.internet.ipV4Address}}",
