@@ -3,6 +3,7 @@ import contextlib
 from fastapi import FastAPI
 
 import user
+import user_info
 import game_server
 import universal.database, universal.config
 
@@ -30,4 +31,5 @@ async def say_hello(name: str = "World"):
 
 
 app.include_router(user.router, prefix="/auth", tags=["auth"])
+app.include_router(user_info.router, prefix="/user", tags=["User with info"])
 app.include_router(game_server.router, prefix="/game_server", tags=["Game server"])

@@ -21,10 +21,7 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-  "name": "Server 1",
-  "description": "Server 1",
-  "reporter_host": "127.0.0.1",
-  "detail": "qwewewe"
+  "address": "127.0.0.1"
 }
 
 ### Delete server #1

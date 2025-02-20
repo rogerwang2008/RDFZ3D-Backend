@@ -25,9 +25,8 @@ POST {{host}}/auth/login
 content-type: application/json
 
 {
-  "username": "  zhangsan",
-  "password": "password",
-  "client_type": null
+  "username": "test001",
+  "password": "password"
 }
 
 > {%
