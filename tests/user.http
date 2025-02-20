@@ -21,6 +21,18 @@ Content-Type: application/json
 }
 
 
+### User Full Create Random
+POST {{host}}/user/
+Content-Type: application/json
+
+{
+  "username": "TEST_RANDOM_{{$random.integer}}",
+  "email": "{{$random.email}}",
+  "phone_no": "139-0000-{{$random.integer(1000, 9999)}}",
+  "password": "password"
+}
+
+
 ### User full read
 GET {{host}}/user/01JMCHCZ7AH1RRWJAFFTBJVG2V
 

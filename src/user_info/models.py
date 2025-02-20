@@ -8,16 +8,17 @@ from . import common
 
 
 class UserInfoId(sqlmodel.SQLModel):
+    # noinspection PyTypeChecker
     id: str = sqlmodel.Field(primary_key=True, foreign_key="user.id", sa_type=sqlalchemy.CHAR(26))
-    # user_auth: user.db.User = sqlmodel.Relationship(back_populates="user_info")
 
 
 class UserInfoBase(sqlmodel.SQLModel):
-    nickname: Optional[str]
-    real_name: Optional[str]
-    gender: Optional[common.GenderEnum]
-    birthday: Optional[datetime.date]
-    identity: Optional[str]
+    nickname: str
+    avatar_path: Optional[str] = None
+    real_name: Optional[str] = None
+    gender: Optional[common.GenderEnum] = None
+    birthday: Optional[datetime.date] = None
+    identity: Optional[str] = None
 
 
 class UserInfoVisibility(sqlmodel.SQLModel):
