@@ -15,7 +15,25 @@ router = APIRouter()
 router.include_router(status.router)
 
 
-@router.post("/", status_code=fastapi.status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    status_code=fastapi.status.HTTP_201_CREATED,
+    responses={
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "description": "Game server already exists",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": {
+                            "info": "Game server already exists",
+                            "field": "address"
+                        }
+                    }
+                }
+            }
+        }
+    },
+)
 async def create_game_server(
         game_server: schemas.GameServerCreate,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
@@ -23,7 +41,11 @@ async def create_game_server(
         db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerReadAdmin:
     print(current_user)
-    return await crud.create_game_server(db_session, current_user, game_server)
+    try:
+        return await crud.create_game_server(db_session, current_user, game_server)
+    except exceptions.GameServerAlreadyExists as e:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                                    detail={"info": "Game server already exists", "field": e.field})
 
 
 @router.get("/")
