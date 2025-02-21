@@ -4,15 +4,15 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-  "address": "localhost:606",
+  "address": "localhost:1",
   "name": "Server {{$random.integer}}",
   "description": "",
-  "reporter_host": "{{$random.internet.ipV4Address}}",
+  "reporter_host": "127.0.0.1",
   "detail": "1a23"
 }
 
 ### Get server
-GET {{host}}/game_server/4
+GET {{host}}/game_server/1
 Authorization: Bearer {{token}}
 
 ### Patch server #1
@@ -21,16 +21,16 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-  "address": "127.0.0.1"
+  "address": "localhost:123"
 }
 
 ### Delete server #1
-DELETE {{host}}/game_server/3
+DELETE {{host}}/game_server/1
 Authorization: Bearer {{token}}
 
 
 ### Report
-POST {{host}}/game_server/report/4
+POST {{host}}/game_server/report/1
 User-Agent: Rdfz3D HTTP Client
 content-type: application/json
 

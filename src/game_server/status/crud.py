@@ -35,6 +35,8 @@ def get_server_status(game_server_id: int) -> models.GameServerStatus:
     """
     if not check_server_not_stopped(game_server_id):
         return models.GameServerStatus(state=common.GameServerStateEnum.STOPPED, last_updated=None)
+    print(reported_data)
+    print(reported_queue)
     return reported_data[game_server_id]
 
 
