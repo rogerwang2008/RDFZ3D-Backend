@@ -3,7 +3,7 @@ import pydantic
 from pydantic.networks import IPvAnyAddress
 
 from . import models
-from .status import common as status_common
+from .status import schemas as status_schemas
 from .status import crud as status_crud
 from .status import models as status_models
 
@@ -24,22 +24,24 @@ class GameServerUpdate(models.GameServerBase):
 
 class GameServerRead(models.GameServerPublic, models.GameServerId):
     """读取游戏服务器信息的 schema"""
-    status: status_models.GameServerStatusBase = None
+    status: status_schemas.GameServerStatusRead = None
 
     @pydantic.model_validator(mode="after")
     def set_status(self) -> "GameServerRead":
         if self.status is None:
-            self.status = status_crud.get_server_status(self.id)
+            self.status = status_schemas.GameServerStatusRead.model_validate(status_crud.get_server_status(self.id),
+                                                                             from_attributes=True)
         return self
 
 
 class GameServerReadAdmin(models.GameServerPublic, models.GameServerId, table=False):
     """管理员读取游戏服务器信息的 schema"""
     reporter_host: IPvAnyAddress
-    status: status_models.GameServerStatusBase = None
+    status: status_schemas.GameServerStatusRead = None
 
     @pydantic.model_validator(mode="after")
     def set_status(self) -> "GameServerReadAdmin":
         if self.status is None:
-            self.status = status_crud.get_server_status(self.id)
+            self.status = status_schemas.GameServerStatusRead.model_validate(status_crud.get_server_status(self.id),
+                                                                             from_attributes=True)
         return self

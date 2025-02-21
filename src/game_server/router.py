@@ -1,5 +1,4 @@
 from typing import Optional
-import aiostream
 import fastapi
 from fastapi import APIRouter
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -56,7 +55,7 @@ async def get_game_servers(
             user.utils.dependencies.get_current_active_verified_user_optional),
         db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
 ) -> list[schemas.GameServerRead] | list[schemas.GameServerReadAdmin]:
-    return await aiostream.stream.list(crud.read_game_servers(db_session, current_user, skip, limit))
+    return list(await crud.read_game_servers(db_session, current_user, skip, limit))
 
 
 @router.get(

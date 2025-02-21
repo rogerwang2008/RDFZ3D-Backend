@@ -1,4 +1,4 @@
-from typing import Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator, Iterable
 
 import sqlalchemy.exc
 import sqlmodel
@@ -78,18 +78,12 @@ async def create_game_server(db_session: AsyncSession,
 async def read_game_servers(db_session: AsyncSession,
                             current_user: Optional[fastapi_users_with_username.models.UP],
                             skip: int = 0, limit: int = 100) \
-        -> AsyncGenerator[schemas.GameServerReadAdmin, None] | AsyncGenerator[schemas.GameServerRead, None]:
+        -> Iterable[schemas.GameServerReadAdmin] | Iterable[schemas.GameServerRead]:
     admin = current_user.is_superuser if current_user else False
     statement = sqlmodel.select(models.GameServer).offset(skip).limit(limit)
     game_servers = await db_session.exec(statement)
-    # return [(schemas.GameServerReadAdmin if admin else schemas.GameServerRead).model_validate(game_server)
-    #         for game_server in game_servers]
-    # result = []
-    for game_server in game_servers:
-        admin_result = schemas.GameServerReadAdmin.model_validate(game_server)
-        admin_result.status = status.crud.get_server_status(game_server.id)
-        # noinspection PyTypeChecker
-        yield admin_result if admin else schemas.GameServerRead.model_validate(game_server)
+    return ((schemas.GameServerReadAdmin if admin else schemas.GameServerRead).model_validate(game_server)
+            for game_server in game_servers)
 
 
 async def read_game_server(db_session: AsyncSession,

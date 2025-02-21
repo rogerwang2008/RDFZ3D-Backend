@@ -12,7 +12,7 @@ content-type: application/json
 }
 
 ### Get server
-GET {{host}}/game_server/1
+GET {{host}}/game_server/
 Authorization: Bearer {{token}}
 
 ### Patch server #1
@@ -36,6 +36,9 @@ content-type: application/json
 
 {
   "player_count": 1,
-  "max_player_count": 10,
-  "state": "running"
+  "state": "running",
+  "game_time": "2025-02-21T14:11:17.574",
+  "day_length": 1,
+  "night_length": 1,
+  "detail": "string"
 }
