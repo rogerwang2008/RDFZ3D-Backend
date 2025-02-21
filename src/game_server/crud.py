@@ -109,6 +109,12 @@ async def update_game_server(db_session: AsyncSession,
                              game_server_id: int,
                              game_server_update: schemas.GameServerUpdate) \
         -> Optional[schemas.GameServerReadAdmin]:
+    if game_server_update.address:
+        try:
+            await get_game_server_by_address(db_session, game_server_update.address)
+            raise exceptions.GameServerAlreadyExists("address")
+        except exceptions.GameServerNotFound:
+            pass
     game_server = await get_game_server(db_session, game_server_id, current_user, True)
     info = game_server_update.model_dump(exclude_unset=True)
     for key, value in info.items():
