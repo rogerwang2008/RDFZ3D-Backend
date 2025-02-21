@@ -22,10 +22,14 @@ class GameServerReport(GameServerStatusBase):
     night_length: Annotated[Optional[datetime.timedelta], pydantic.BeforeValidator(minutes_to_seconds_validator)] = None
 
 
+def timedelta_to_minutes_validator(value: Any) -> Any:
+    if isinstance(value, datetime.timedelta):
+        return value.total_seconds() / 60
+    else:
+        return value
+
+
 class GameServerStatusRead(GameServerStatusBase):
     """请求游戏服务器状态的 schema"""
-    model_config = pydantic.ConfigDict(
-        json_encoders={
-            datetime.timedelta: lambda v: v.total_seconds() / 60,
-        }
-    )
+    day_length: Annotated[Optional[float], pydantic.BeforeValidator(timedelta_to_minutes_validator)] = None
+    night_length: Annotated[Optional[float], pydantic.BeforeValidator(timedelta_to_minutes_validator)] = None
