@@ -97,6 +97,7 @@ async def read_game_server(db_session: AsyncSession,
 
 async def update_game_server(db_session: AsyncSession,
                              current_user: Optional[fastapi_users_with_username.models.UP],
+                             host: Optional[str],
                              game_server_id: int,
                              game_server_update: schemas.GameServerUpdate) \
         -> Optional[schemas.GameServerReadAdmin]:
@@ -106,7 +107,10 @@ async def update_game_server(db_session: AsyncSession,
             raise exceptions.GameServerAlreadyExists("address")
         except exceptions.GameServerNotFound:
             pass
-    game_server = await get_game_server(db_session, game_server_id, current_user, True)
+    game_server = await get_game_server(db_session, game_server_id)
+    if host != game_server.reporter_host and (
+            current_user is None or (not current_user.is_superuser and not game_server.admin_id != current_user.id)):
+        raise exceptions.PermissionDenied()
     info = game_server_update.model_dump(exclude_unset=True)
     for key, value in info.items():
         setattr(game_server, key, value)

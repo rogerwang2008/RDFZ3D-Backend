@@ -78,6 +78,7 @@ async def get_game_server(
 
 @router.patch("/{game_server_id}")
 async def update_game_server(
+        request: fastapi.Request,
         game_server_id: int,
         game_server: schemas.GameServerUpdate,
         current_user: Optional[fastapi_users_with_username.models.UP] = fastapi.Depends(
@@ -85,7 +86,7 @@ async def update_game_server(
         db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.GameServerReadAdmin:
     try:
-        return await crud.update_game_server(db_session, current_user, game_server_id, game_server)
+        return await crud.update_game_server(db_session, current_user, request.client.host, game_server_id, game_server)
     except exceptions.GameServerNotFound:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
     except exceptions.PermissionDenied:
