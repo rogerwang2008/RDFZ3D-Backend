@@ -76,7 +76,26 @@ async def get_game_server(
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
 
 
-@router.patch("/{game_server_id}")
+@router.patch(
+    "/{game_server_id}",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {"description": "Game server not found"},
+        fastapi.status.HTTP_403_FORBIDDEN: {"description": "Not the admin or superuser"},
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "description": "Game server already exists",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": {
+                            "info": "Game server already exists",
+                            "field": "address",
+                        }
+                    }
+                }
+            }
+        }
+    }
+)
 async def update_game_server(
         request: fastapi.Request,
         game_server_id: int,
@@ -91,6 +110,9 @@ async def update_game_server(
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_404_NOT_FOUND, detail="Game server not found")
     except exceptions.PermissionDenied:
         raise fastapi.HTTPException(status_code=fastapi.status.HTTP_403_FORBIDDEN, detail="Not the admin or superuser")
+    except exceptions.GameServerAlreadyExists as e:
+        raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                                    detail={"info": "Game server already exists", "field": e.field})
 
 
 @router.delete("/{game_server_id}")
