@@ -98,10 +98,7 @@ async def read_game_server(db_session: AsyncSession,
         -> Optional[schemas.GameServerRead | schemas.GameServerReadAdmin]:
     game_server = await get_game_server(db_session, game_server_id)
     admin = (current_user.is_superuser or game_server.admin_id == current_user.id) if current_user else False
-    # return (schemas.GameServerReadAdmin if admin else schemas.GameServerRead).model_validate(game_server)
-    admin_result = schemas.GameServerReadAdmin.model_validate(game_server)
-    admin_result.status = status.crud.get_server_status(game_server_id)
-    return admin_result if admin else schemas.GameServerRead.model_validate(game_server)
+    return (schemas.GameServerReadAdmin if admin else schemas.GameServerRead).model_validate(game_server)
 
 
 async def update_game_server(db_session: AsyncSession,

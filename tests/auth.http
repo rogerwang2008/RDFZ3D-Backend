@@ -1,14 +1,3 @@
-### 注册 zhangsan
-POST {{host}}/auth/register
-content-type: application/json
-
-{
-  "username": "zhangsan",
-  "email": "zhangsan@example.com",
-  "phone_no": "19898009808",
-  "password": "password"
-}
-
 ### 登录 zhangsan
 POST {{host}}/auth/login
 content-type: application/json
@@ -25,25 +14,3 @@ content-type: application/json
 ### 登出
 POST {{host}}/auth/logout
 Authorization: Bearer {{token}}
-
-### 获取用户信息
-GET {{host}}/auth/me
-Authorization: Bearer {{token}}
-
-### 修改自己的手机号
-PATCH {{host}}/auth/me
-Authorization: Bearer {{token}}
-content-type: application/json
-
-{
-  "phone_no": "+86 135-1128-8028"
-}
-
-### 修改自己的邮箱
-PATCH {{host}}/auth/me
-Authorization: Bearer {{token}}
-content-type: application/json
-
-{
-  "email": " {{$random.email}}"
-}

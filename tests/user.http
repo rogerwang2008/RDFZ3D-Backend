@@ -15,7 +15,7 @@ Content-Type: application/json
   "email_public": false,
   "phone_no_public": false,
   "real_name_public": true,
-  "gender_public": true,
+  "gender_public": false,
   "birthday_public": true,
   "identity_public": true
 }
@@ -48,5 +48,5 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nickname": "测试12333"
+  "phone_no": "139-0001-{{$random.integer(1000, 9999)}}"
 }
