@@ -54,7 +54,7 @@ HTTP_400_DOC = {
 # region Register
 
 @router.post(
-    "/",
+    "/register",
     status_code=fastapi.status.HTTP_201_CREATED,
     responses={
         fastapi.status.HTTP_400_BAD_REQUEST: HTTP_400_DOC
