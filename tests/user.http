@@ -1,5 +1,5 @@
 ### User Full Create
-POST {{host}}/user/
+POST {{host}}/user/register
 Content-Type: application/json
 
 {
