@@ -14,7 +14,7 @@ class UserInfoId(sqlmodel.SQLModel):
 
 class UserInfoBase(sqlmodel.SQLModel):
     nickname: str
-    avatar_path: Optional[str] = None
+    avatar_path: str = "/assets/avatar/default_avatar.png"
     real_name: Optional[str] = None
     gender: Optional[common.GenderEnum] = None
     birthday: Optional[datetime.date] = None

@@ -46,6 +46,7 @@ async def create_user(db_session: AsyncSession,
     user_auth = await user_manager.create(user.schemas.UserCreate.model_validate(info), True, request=request)
     user_id = user_auth.id
     info["id"] = user_id
+    del info["avatar_path"]
     user_info_model = models.UserInfo.model_validate(info)
     db_session.add(user_info_model)
     await db_session.commit()
@@ -92,6 +93,8 @@ async def update_user(db_session: AsyncSession,
         user_auth, True, request)
     user_info = await get_user_info(db_session, user_auth.id)
     update_info = user_full_update.model_dump(exclude_unset=True)
+    if "avatar_path" in update_info:
+        del update_info["avatar_path"]
     for key, value in update_info.items():
         try:
             setattr(user_info, key, value)

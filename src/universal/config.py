@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     DATABASE_URI: str = (f"mysql+asyncmy://{settings_dict['database']['username']}:{settings_dict['database']['password']}"
                          f"@{settings_dict['database']['host']}:{settings_dict['database']['port']}"
                          f"/{settings_dict['database']['database']}")
+    STATIC_DIR: pathlib.Path = SETTINGS_DIR.parent / "static"
+    ASSETS_DIR: pathlib.Path = SETTINGS_DIR.parent / "assets"
+
+    ORIGIN_REGEX: str = r"^https?://((localhost|127\.0\.0\.1)(:\d+)?|(.*\.)?x-way\.work)$"
 
     class Config:
         case_sensitive = True
