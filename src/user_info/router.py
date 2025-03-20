@@ -1,5 +1,7 @@
 import fastapi
 from fastapi import APIRouter
+from pydantic import EmailStr
+from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 import fastapi_users.exceptions
@@ -192,11 +194,61 @@ async def read_user(user_id: str,
     },
 )
 async def read_user_by_username(username: str,
-                    user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
-                    db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
-                    ) -> schemas.UserFullRead:
+                                user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                                db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                                ) -> schemas.UserFullRead:
     try:
         return await crud.read_user_by_username(db_session, user_manager, username)
+    except fastapi_users.exceptions.UserNotExists:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    except fastapi_users.exceptions.UserInactive:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Inactive user",
+        )
+
+
+@router.get(
+    "/get_by_email/{email}",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Inactive user"},
+    },
+)
+async def read_user_by_username(email: EmailStr,
+                                user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                                db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                                ) -> schemas.UserFullRead:
+    try:
+        return await crud.read_user_by_email(db_session, user_manager, email)
+    except fastapi_users.exceptions.UserNotExists:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    except fastapi_users.exceptions.UserInactive:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Inactive user",
+        )
+
+
+@router.get(
+    "/get_by_phone_no/{phone_no}",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Inactive user"},
+    },
+)
+async def read_user_by_phone_number(phone_no: PhoneNumber,
+                                    user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                                    db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                                    ) -> schemas.UserFullRead:
+    try:
+        return await crud.read_user_by_phone_no(db_session, user_manager, phone_no)
     except fastapi_users.exceptions.UserNotExists:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,

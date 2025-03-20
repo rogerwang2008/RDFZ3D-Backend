@@ -2,6 +2,8 @@ from typing import Optional
 import fastapi
 import sqlalchemy.exc
 import sqlmodel
+from pydantic import EmailStr
+from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 import fastapi_users.exceptions
@@ -75,6 +77,21 @@ async def read_user_by_username(db_session: AsyncSession,
                                 user_manager: user.users.UserManager,
                                 username: str, ) -> schemas.UserFullRead:
     user_auth = await user_manager.get_by_username(username)
+    return await read_user(db_session, user_manager, user_auth.id)
+
+
+async def read_user_by_email(db_session: AsyncSession,
+                             user_manager: user.users.UserManager,
+                             email: EmailStr) -> schemas.UserFullRead:
+    # noinspection PyTypeChecker
+    user_auth = await user_manager.get_by_email(email)
+    return await read_user(db_session, user_manager, user_auth.id)
+
+
+async def read_user_by_phone_no(db_session: AsyncSession,
+                                user_manager: user.users.UserManager,
+                                phone_no: PhoneNumber, ) -> schemas.UserFullRead:
+    user_auth = await user_manager.get_by_phone_no(phone_no)
     return await read_user(db_session, user_manager, user_auth.id)
 
 
