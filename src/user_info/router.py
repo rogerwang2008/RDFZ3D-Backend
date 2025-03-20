@@ -183,4 +183,29 @@ async def read_user(user_id: str,
             detail="Inactive user",
         )
 
+
+@router.get(
+    "/get_by_username/{username}",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Inactive user"},
+    },
+)
+async def read_user_by_username(username: str,
+                    user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+                    db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+                    ) -> schemas.UserFullRead:
+    try:
+        return await crud.read_user_by_username(db_session, user_manager, username)
+    except fastapi_users.exceptions.UserNotExists:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    except fastapi_users.exceptions.UserInactive:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Inactive user",
+        )
+
 # endregion

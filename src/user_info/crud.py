@@ -1,5 +1,6 @@
 from typing import Optional
 import fastapi
+import sqlalchemy.exc
 import sqlmodel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -22,11 +23,12 @@ async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_fou
     """
     statement = sqlmodel.select(models.UserInfo).where(models.UserInfo.id == user_id)
     user_info = await db_session.exec(statement)
-    if not user_info:
+    try:
+        return user_info.one()
+    except sqlalchemy.exc.NoResultFound:
         if raise_on_not_found:
             raise fastapi_users.exceptions.UserNotExists()
         return None
-    return user_info.one()
 
 
 async def create_user(db_session: AsyncSession,
@@ -68,6 +70,13 @@ async def read_user(db_session: AsyncSession,
         field = key[:-7]  # Remove "_public"
         setattr(result, field, None)  # Also works with bool
     return result
+
+
+async def read_user_by_username(db_session: AsyncSession,
+                                user_manager: user.users.UserManager,
+                                username: str, ) -> schemas.UserFullRead:
+    user_auth = await user_manager.get_by_username(username)
+    return await read_user(db_session, user_manager, user_auth.id)
 
 
 async def read_user_admin(db_session: AsyncSession,
