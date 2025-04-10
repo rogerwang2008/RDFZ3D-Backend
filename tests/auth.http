@@ -4,7 +4,7 @@ content-type: application/json
 
 {
   "username": "test001",
-  "password": "password"
+  "password": "password2"
 }
 
 > {%
@@ -14,3 +14,13 @@ content-type: application/json
 ### 登出
 POST {{host}}/auth/logout
 Authorization: Bearer {{token}}
+
+### Change password
+POST {{host}}/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "old_password": "password2",
+  "new_password": "password"
+}

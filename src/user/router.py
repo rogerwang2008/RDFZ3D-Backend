@@ -1,6 +1,10 @@
 from fastapi import APIRouter
+import fastapi
+import fastapi_users_with_username
+import fastapi_users_with_username.router
 
-from . import schemas, users
+
+from . import schemas, users, utils, exceptions
 
 router = APIRouter()
 
@@ -34,3 +38,25 @@ router.include_router(
     users.fastapi_users_obj.get_users_router(schemas.UserRead, schemas.UserUpdate),
     prefix="",
 )
+
+@router.post(
+    "/change-password",
+    responses={
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Missing token or inactive user"},
+        fastapi.status.HTTP_400_BAD_REQUEST: {"description": "Wrong old password"},
+    },
+
+)
+async def change_password(
+        old_password: str = fastapi.Body(..., embed=True),
+        new_password: str = fastapi.Body(..., embed=True),
+        user_manager: users.UserManager = fastapi.Depends(users.get_user_manager),
+        user_auth: fastapi_users_with_username.models.UP = fastapi.Depends(utils.dependencies.get_current_user),
+) -> schemas.UserRead:
+    try:
+        return await user_manager.change_password(user_auth, old_password, new_password)
+    except exceptions.WrongPassword:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="Wrong old password"
+        )

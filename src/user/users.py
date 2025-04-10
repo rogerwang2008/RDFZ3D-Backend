@@ -10,11 +10,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 import fastapi_users_with_username
 import fastapi_users_with_username.exceptions
+import fastapi_users_with_username.schemas
 
 import universal.config
 import universal.database
 from . import db
 from . import schemas
+from . import exceptions
 
 SECRET = universal.config.settings.SECRET_KEY
 
@@ -34,6 +36,16 @@ class UserManager(fastapi_users_with_username.ULIDIDMixin,
         if not user.is_email_verified:
             result.email = None
         return result
+
+    async def change_password(self, user: models.UP, old_password: str, new_password: str) -> models.UP:
+        credentials = fastapi_users_with_username.schemas.BaseUserLogin(username=user.username, password=old_password)
+        authenticated_user = await self.authenticate(credentials)
+        if authenticated_user is None:
+            print("Wrong password")
+            raise exceptions.WrongPassword()
+        await self.validate_password(new_password, user)
+        updated_user = await self._update(user, {"password": new_password})
+        return updated_user
 
     async def on_after_register(self, user: db.User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
