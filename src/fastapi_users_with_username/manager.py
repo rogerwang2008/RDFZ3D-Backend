@@ -268,6 +268,25 @@ class BaseUserManager(fastapi_users.BaseUserManager[models.UP, fastapi_users.mod
         """
         return
 
+    async def change_password(self, user: models.UP, old_password: str, new_password: str) -> models.UP:
+        """
+        Change a user password.
+
+        :param user: The user to change the password for.
+        :param old_password: The old password.
+        :param new_password: The new password.
+        :raises exceptions.WrongPassword: The old password is incorrect.
+        :return: The updated user.
+        """
+        credentials = schemas.BaseUserLogin(username=user.username, password=old_password)
+        authenticated_user = await self.authenticate(credentials)
+        if authenticated_user is None:
+            print("Wrong password")
+            raise exceptions.WrongPassword()
+        await self.validate_password(new_password, user)
+        updated_user = await self._update(user, {"password": new_password})
+        return updated_user
+
 
 class ULIDIDMixin:
     # noinspection PyMethodMayBeStatic

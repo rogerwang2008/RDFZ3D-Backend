@@ -9,9 +9,10 @@ import fastapi_users.router
 import fastapi_users_with_username.exceptions
 import fastapi_users_with_username.common
 import fastapi_users_with_username.router.common
-import user.users, user.utils.dependencies
+import user.users
+import user.utils
 import universal.database
-from . import schemas, crud, common
+from . import schemas, crud
 
 router = APIRouter()
 
@@ -20,29 +21,29 @@ HTTP_400_DOC = {
     "content": {
         "application/json": {
             "examples": {
-                common.ErrorCode.USER_ALREADY_EXISTS: {
+                fastapi_users_with_username.router.common.GeneralCode.USER_ALREADY_EXISTS: {
                     "summary": "A user with this username/email/phone_no (provided in detail) already exists.",
                     "value": {
                         "detail": {
-                            "code": common.ErrorCode.USER_ALREADY_EXISTS,
+                            "code": fastapi_users_with_username.router.common.GeneralCode.USER_ALREADY_EXISTS,
                             "identifier": fastapi_users_with_username.common.Identifiers.EMAIL,
                         }
                     },
                 },
-                common.ErrorCode.INVALID_USERNAME: {
+                fastapi_users_with_username.router.common.GeneralCode.INVALID_USERNAME: {
                     "summary": "Username validation failed.",
                     "value": {
                         "detail": {
-                            "code": common.ErrorCode.INVALID_USERNAME,
+                            "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_USERNAME,
                             "reason": "Username should be at least 3 characters",
                         }
                     },
                 },
-                common.ErrorCode.INVALID_PASSWORD: {
+                fastapi_users_with_username.router.common.GeneralCode.INVALID_PASSWORD: {
                     "summary": "Password validation failed.",
                     "value": {
                         "detail": {
-                            "code": common.ErrorCode.INVALID_PASSWORD,
+                            "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_PASSWORD,
                             "reason": "Password should be at least 3 characters",
                         }
                     },
@@ -73,7 +74,7 @@ async def create_user(user_full: schemas.UserFullCreate,
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.USER_ALREADY_EXISTS,
+                "code": fastapi_users_with_username.router.common.GeneralCode.USER_ALREADY_EXISTS,
                 "identifier": e.identifier,
             }
         )
@@ -81,7 +82,7 @@ async def create_user(user_full: schemas.UserFullCreate,
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.INVALID_USERNAME,
+                "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_USERNAME,
                 "reason": e.reason,
             }
         )
@@ -89,7 +90,7 @@ async def create_user(user_full: schemas.UserFullCreate,
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.INVALID_PASSWORD,
+                "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_PASSWORD,
                 "reason": e.reason,
             },
         )
@@ -135,7 +136,7 @@ async def update_user_me(
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.USER_ALREADY_EXISTS,
+                "code": fastapi_users_with_username.router.common.GeneralCode.USER_ALREADY_EXISTS,
                 "identifier": e.identifier,
             }
         )
@@ -143,7 +144,7 @@ async def update_user_me(
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.INVALID_USERNAME,
+                "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_USERNAME,
                 "reason": e.reason,
             }
         )
@@ -151,7 +152,7 @@ async def update_user_me(
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail={
-                "code": common.ErrorCode.INVALID_PASSWORD,
+                "code": fastapi_users_with_username.router.common.GeneralCode.INVALID_PASSWORD,
                 "reason": e.reason,
             },
         )

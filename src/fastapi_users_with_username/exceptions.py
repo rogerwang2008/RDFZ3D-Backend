@@ -13,3 +13,8 @@ class UserWithIdentifierAlreadyExists(fastapi_users.exceptions.UserAlreadyExists
 class InvalidUsernameException(fastapi_users.exceptions.FastAPIUsersException):
     def __init__(self, reason: Any) -> None:
         self.reason = reason
+
+
+class WrongPassword(fastapi_users.exceptions.FastAPIUsersException):
+    pass
+

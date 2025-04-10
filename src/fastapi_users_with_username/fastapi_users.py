@@ -54,3 +54,12 @@ class FastAPIUsers(fastapi_users.FastAPIUsers[models.UP, fastapi_users.models.ID
             login_description,
             logout_description,
         )
+
+    def get_users_extra_router(
+            self,
+    ) -> fastapi.APIRouter:
+        """
+        Return a router only with extra user routes.
+        """
+
+        return router.get_users_extra_router(self.get_user_manager, self.authenticator)
