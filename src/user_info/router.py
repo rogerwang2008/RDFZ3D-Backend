@@ -158,6 +158,16 @@ async def update_user_me(
         )
 
 
+@router.post("/upload_avatar")
+async def upload_avatar(
+        user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
+        user_auth: fastapi_users_with_username.models.UP = fastapi.Depends(
+            user.utils.dependencies.get_current_active_user),
+        avatar_file: fastapi.UploadFile = fastapi.File(...),
+        db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
+) -> None:
+    return await crud.upload_avatar(db_session, user_manager, user_auth, avatar_file.file, avatar_file.content_type)
+
 # endregion
 
 # region Public

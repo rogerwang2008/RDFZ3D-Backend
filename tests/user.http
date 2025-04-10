@@ -50,3 +50,16 @@ Content-Type: application/json
 {
   "phone_no": "139-0001-{{$random.integer(1000, 9999)}}"
 }
+
+
+### User upload avatar
+POST {{host}}/user/upload_avatar
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="avatar_file"; filename="test.jpg"
+Content-Type: image/jpeg
+
+< ./test.jpg
+--WebAppBoundary--

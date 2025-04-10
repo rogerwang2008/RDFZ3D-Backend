@@ -4,7 +4,7 @@ content-type: application/json
 
 {
   "username": "test001",
-  "password": "password"
+  "password": "password2"
 }
 
 > {%

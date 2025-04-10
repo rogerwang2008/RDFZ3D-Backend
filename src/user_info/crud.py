@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, BinaryIO
 import fastapi
 import sqlalchemy.exc
 import sqlmodel
@@ -12,6 +12,7 @@ import fastapi_users_with_username.models
 import user.schemas
 import user.users
 from . import schemas, models
+from . import avatar
 
 
 async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_found: bool = True) \
@@ -128,3 +129,15 @@ async def update_user(db_session: AsyncSession,
             continue
     await db_session.commit()
     return schemas.UserFullReadAdmin.model_validate(updated_user_auth.model_dump() | user_info.model_dump())
+
+
+async def upload_avatar(db_session: AsyncSession,
+                        user_manager: user.users.UserManager,
+                        user_auth: fastapi_users_with_username.models.UP,
+                        avatar_file_bytes: BinaryIO,
+                        content_type: str):
+    filename = await avatar.save_avatar(avatar_file_bytes, content_type, user_auth.id)
+    user_info = await get_user_info(db_session, user_auth.id)
+    user_info.avatar_path = f"/avatar/{filename}"
+    await db_session.commit()
+    return user_info.avatar_path
