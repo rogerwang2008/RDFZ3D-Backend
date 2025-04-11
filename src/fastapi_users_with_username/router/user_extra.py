@@ -17,6 +17,7 @@ def get_users_extra_router(
 
     @router.post(
         "/change-password",
+        status_code=fastapi.status.HTTP_204_NO_CONTENT,
         responses={
             fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Missing token or inactive user"},
             fastapi.status.HTTP_400_BAD_REQUEST: {"description": "Wrong old password"},
