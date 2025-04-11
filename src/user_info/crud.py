@@ -136,8 +136,8 @@ async def upload_avatar(db_session: AsyncSession,
                         user_auth: fastapi_users_with_username.models.UP,
                         avatar_file_bytes: BinaryIO,
                         content_type: str):
-    filename = await avatar.save_avatar(avatar_file_bytes, content_type, user_auth.id)
+    filename = await avatar.save_avatar(avatar_file_bytes, user_auth.id)
     user_info = await get_user_info(db_session, user_auth.id)
-    user_info.avatar_path = f"/avatar/{filename}"
+    user_info.avatar_path = f"/static/avatar/{filename}"
     await db_session.commit()
     return user_info.avatar_path

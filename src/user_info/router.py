@@ -1,3 +1,4 @@
+import PIL
 import fastapi
 from fastapi import APIRouter
 from pydantic import EmailStr
@@ -158,7 +159,13 @@ async def update_user_me(
         )
 
 
-@router.post("/upload_avatar")
+@router.post(
+    "/upload_avatar",
+    responses={
+        fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Missing token or inactive user"},
+        fastapi.status.HTTP_415_UNSUPPORTED_MEDIA_TYPE: {"description": "Unsupported media type"},
+    },
+)
 async def upload_avatar(
         user_manager: user.users.UserManager = fastapi.Depends(user.users.get_user_manager),
         user_auth: fastapi_users_with_username.models.UP = fastapi.Depends(
@@ -166,7 +173,14 @@ async def upload_avatar(
         avatar_file: fastapi.UploadFile = fastapi.File(...),
         db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
 ) -> None:
-    return await crud.upload_avatar(db_session, user_manager, user_auth, avatar_file.file, avatar_file.content_type)
+    try:
+        return await crud.upload_avatar(db_session, user_manager, user_auth, avatar_file.file, avatar_file.content_type)
+    except PIL.UnidentifiedImageError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Unsupported image type",
+        )
+
 
 # endregion
 
