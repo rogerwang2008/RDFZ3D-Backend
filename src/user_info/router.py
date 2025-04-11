@@ -132,7 +132,7 @@ async def update_user_me(
         db_session: AsyncSession = fastapi.Depends(universal.database.get_async_session),
 ) -> schemas.UserFullReadAdmin:
     try:
-        return await crud.update_user(db_session, user_manager, user_auth, user_update, request)
+        return await crud.update_user(db_session, user_manager, user_auth, user_update, True, request)
     except fastapi_users_with_username.exceptions.UserWithIdentifierAlreadyExists as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,

@@ -2,6 +2,7 @@ from typing import Optional, BinaryIO
 import fastapi
 import sqlalchemy.exc
 import sqlmodel
+import pathlib
 from pydantic import EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -27,7 +28,11 @@ async def get_user_info(db_session: AsyncSession, user_id: str, raise_on_not_fou
     statement = sqlmodel.select(models.UserInfo).where(models.UserInfo.id == user_id)
     user_info = await db_session.exec(statement)
     try:
-        return user_info.one()
+        user_info = user_info.one()
+        if not user_info.avatar_path or not user_info.avatar_path.startswith("/static/avatar/"):
+            user_info.avatar_path = "/static/avatar/default_avatar.png"
+            await db_session.commit()
+        return user_info
     except sqlalchemy.exc.NoResultFound:
         if raise_on_not_found:
             raise fastapi_users.exceptions.UserNotExists()
@@ -114,14 +119,18 @@ async def update_user(db_session: AsyncSession,
                       user_manager: user.users.UserManager,
                       user_auth: fastapi_users_with_username.models.UP,
                       user_full_update: schemas.UserFullUpdate,
+                      safe: bool = False,
                       request: Optional[fastapi.Request] = None, ) -> schemas.UserFullReadAdmin:
+    update_info = user_full_update.model_dump(exclude_unset=True)
+    if safe:
+        if "password" in update_info:
+            del update_info["password"]
+        if "avatar_path" in update_info:
+            del update_info["avatar_path"]
     updated_user_auth = await user_manager.update(
-        user.schemas.UserUpdate.model_validate(user_full_update.model_dump(exclude_unset=True)),
+        user.schemas.UserUpdate.model_validate(update_info),
         user_auth, True, request)
     user_info = await get_user_info(db_session, user_auth.id)
-    update_info = user_full_update.model_dump(exclude_unset=True)
-    if "avatar_path" in update_info:
-        del update_info["avatar_path"]
     for key, value in update_info.items():
         try:
             setattr(user_info, key, value)
@@ -137,7 +146,6 @@ async def upload_avatar(db_session: AsyncSession,
                         avatar_file_bytes: BinaryIO,
                         content_type: str):
     filename = await avatar.save_avatar(avatar_file_bytes, user_auth.id)
-    user_info = await get_user_info(db_session, user_auth.id)
-    user_info.avatar_path = f"/static/avatar/{filename}"
-    await db_session.commit()
-    return user_info.avatar_path
+    avatar_path = f"/static/avatar/{filename}"
+    await update_user(db_session, user_manager, user_auth, schemas.UserFullUpdate(avatar_path=avatar_path))
+    return avatar_path
