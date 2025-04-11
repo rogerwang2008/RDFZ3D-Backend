@@ -33,7 +33,6 @@ app.add_middleware(
 )
 
 app.mount("/static", fastapi.staticfiles.StaticFiles(directory=universal.config.settings.STATIC_DIR), name="static")
-app.mount("/assets", fastapi.staticfiles.StaticFiles(directory=universal.config.settings.ASSETS_DIR), name="assets")
 
 
 @app.get("/")

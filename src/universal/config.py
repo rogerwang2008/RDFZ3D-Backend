@@ -20,7 +20,6 @@ class Settings(BaseSettings):
                          f"@{settings_dict['database']['host']}:{settings_dict['database']['port']}"
                          f"/{settings_dict['database']['database']}")
     STATIC_DIR: pathlib.Path = SETTINGS_DIR.parent / "static"
-    ASSETS_DIR: pathlib.Path = SETTINGS_DIR.parent / "assets"
 
     ORIGIN_REGEX: str = r"^https?://((localhost|127\.0\.0\.1)(:\d+)?|(.*\.)?x-way\.work)$"
 
