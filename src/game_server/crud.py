@@ -22,15 +22,18 @@ async def get_game_server(db_session: AsyncSession,
     :param current_user: Only useful when permission_check is True
     :param requires_admin:
     :param raise_on_not_found:
+    :raises .exceptions.GameServerNotFound: If the game server is not found and ``raise_on_not_found``, raises this exception.
+    :raises .exceptions.PermissionDenied: If the user does not have permission to access the game server.
     :return:
     """
     statement = sqlmodel.select(models.GameServer).where(models.GameServer.id == game_server_id)
     game_server = await db_session.exec(statement)
-    if not game_server:
+    try:
+        game_server = game_server.one()
+    except sqlalchemy.exc.NoResultFound:
         if raise_on_not_found:
             raise exceptions.GameServerNotFound()
         return None
-    game_server = game_server.one()
     if requires_admin:
         if not (current_user.is_superuser or game_server.admin_id == current_user.id):
             raise exceptions.PermissionDenied()

@@ -9,7 +9,7 @@ from .. import schemas
 def get_auth_router(
         backend: fastapi_users.authentication.AuthenticationBackend[fastapi_users.models.UP, fastapi_users.models.ID],
         get_user_manager: fastapi_users.manager.UserManagerDependency[fastapi_users.models.UP, fastapi_users.models.ID],
-        authenticator: fastapi_users.authentication.Authenticator[fastapi_users.models.UP, fastapi_users.models.ID],
+        authenticator: fastapi_users.authentication.Authenticator,
         user_login_schema: type[schemas.UL],
         requires_verification: bool = False,
         login_description: Optional[str] = None,

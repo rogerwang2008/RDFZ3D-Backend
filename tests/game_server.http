@@ -11,6 +11,20 @@ content-type: application/json
   "detail": "1a23"
 }
 
+### Create a new game server (公网)
+POST {{host}}/game_server/
+Authorization: Bearer {{token}}
+content-type: application/json
+
+{
+  "address": "localhost:11451",
+  "name": "Server {{$random.integer}}",
+  "description": "TEST from WCJ",
+  "reporter_host": "123.118.212.180",
+  "detail": ""
+}
+
+
 ### Get server
 GET {{host}}/game_server/
 Authorization: Bearer {{token}}
@@ -30,7 +44,7 @@ Authorization: Bearer {{token}}
 
 
 ### Report
-POST {{host}}/game_server/report/1
+POST {{host}}/game_server/report/2
 User-Agent: Rdfz3D HTTP Client
 content-type: application/json
 

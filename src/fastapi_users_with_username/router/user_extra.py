@@ -20,7 +20,27 @@ def get_users_extra_router(
         status_code=fastapi.status.HTTP_204_NO_CONTENT,
         responses={
             fastapi.status.HTTP_401_UNAUTHORIZED: {"description": "Missing token or inactive user"},
-            fastapi.status.HTTP_400_BAD_REQUEST: {"description": "Wrong old password"},
+            fastapi.status.HTTP_400_BAD_REQUEST: {
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            common.GeneralCode.WRONG_PASSWORD: {
+                                "summary": "Wrong old password.",
+                                "value": {
+                                    "detail": common.GeneralCode.WRONG_PASSWORD,
+                                },
+                            },
+                            common.GeneralCode.INVALID_PASSWORD: {
+                                "summary": "Invalid password.",
+                                "value": {
+                                    "detail": common.GeneralCode.INVALID_PASSWORD,
+                                },
+                            },
+
+                        }
+                    }
+                }
+            },
         },
 
     )
