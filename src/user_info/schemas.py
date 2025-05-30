@@ -17,7 +17,7 @@ class UserFullCreate(models.UserInfoVisibility, models.UserInfoBase, user.schema
     @pydantic.model_validator(mode="after")
     def set_default_nickname(self) -> "UserFullCreate":
         if self.nickname is None:
-            self.nickname = self.username
+            self.nickname = self.username.replace("_", " ").title()
         return self
 
 
