@@ -19,7 +19,7 @@ async def save_avatar(avatar_file_bytes: BinaryIO, file_name: str) -> str:
     top = (height - size) // 2
     right = (width + size) // 2
     bottom = (height + size) // 2
-    avatar_file = avatar_file.crop((left, top, right, bottom))
+    avatar_file = avatar_file.convert("RGB").crop((left, top, right, bottom))
 
     if avatar_file.width > MAX_SIDE_LEN or avatar_file.height > MAX_SIDE_LEN:
         avatar_file.thumbnail((MAX_SIDE_LEN, MAX_SIDE_LEN), Image.Resampling.LANCZOS)
